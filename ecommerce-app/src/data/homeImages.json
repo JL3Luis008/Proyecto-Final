@@ -1,0 +1,35 @@
+[
+  {
+    "title": "El mejor catalogo de video juegos retro",
+    "subtitle": "Juega tus clasicos preferidos",
+    "image": ["/img/products/banner1.jpg"],
+    "buttonText": "Ver colección",
+    "buttonLink": "/collections/retro",
+    "backgroundColor": "#26336c"
+  },
+  {
+    "title": "streaming de tus juegos retro preferidos",
+    "subtitle": "visita nuestra pagina para ver streamings",
+    "image": ["/img/products/banner2.jpg"],
+    "buttonText": "visitanos",
+    "buttonLink": "/streaming",
+    "backgroundColor": "#8677b5"
+  },
+  {
+    "title": "los mejores reviews de los juegos de nuetro catalogo",
+    "subtitle": "revisa nuestras reviews de tus sagas preferidas",
+    "image": ["/img/products/banner3.jpg"],
+    "buttonText": "Explorar",
+    "buttonLink": "/reviews",
+    "backgroundColor": "#3eb7ea"
+  },
+  {
+    "title": "Envío Gratis",
+    "subtitle": "En compras superiores a $1000",
+    "image": ["/img/products/banner4.png"],
+    "buttonText": "Comprar Ahora",
+    "buttonLink": "/free-shipping",
+    "backgroundColor": "#79bf87"
+  }
+]
+

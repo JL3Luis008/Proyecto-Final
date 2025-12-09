@@ -1,0 +1,116 @@
+{
+	"info": {
+		"_postman_id": "ed9d3f80-f436-4228-ae88-081bd8b4ad63",
+		"name": "Category",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2742061"
+	},
+	"item": [
+		{
+			"name": "getAll",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{apiURL}}/categories",
+					"host": [
+						"{{apiURL}}"
+					],
+					"path": [
+						"categories"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "getById",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{apiURL}}/categories/{{idCategory}}",
+					"host": [
+						"{{apiURL}}"
+					],
+					"path": [
+						"categories",
+						"{{idCategory}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "post",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Electrónicos\",\n  \"description\": \"Dispositivos electrónicos y gadgets\",\n  \"parentCategory\": null,\n  \"imageUrl\": \"https://placehold.co/800x600.png\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiURL}}/categories",
+					"host": [
+						"{{apiURL}}"
+					],
+					"path": [
+						"categories"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "put",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"name\": \"Electrónicos\",\n  \"description\": \"Dispositivos electrónicos y gadgets (atualizado)\",\n  \"parentCategory\": null,\n  \"imageUrl\": \"https://placehold.co/800x600.png\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{apiURL}}/categories/{{idCategory}}",
+					"host": [
+						"{{apiURL}}"
+					],
+					"path": [
+						"categories",
+						"{{idCategory}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{apiURL}}/categories/{{idCategory}}",
+					"host": [
+						"{{apiURL}}"
+					],
+					"path": [
+						"categories",
+						"{{idCategory}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

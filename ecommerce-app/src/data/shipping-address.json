@@ -1,0 +1,24 @@
+[
+  {
+    "_id": "691262744278bbc102261a4a",
+    "name": "casa",
+    "address1": "Calle paseos de cuervero 124",
+    "address2": "Colonia paseos de Aguascalientes",
+    "postalCode": "20907",
+    "city": "Aguascalientes",
+    "country": "México",
+    "reference": "Entre calle paseos de jesus maria y paseos de Peñuelas",
+    "default": true
+  },
+  {
+    "_id": "691262743258bbc102261a4a",
+    "name": "Trabajo",
+    "address1": "Calle Municipi de Calvillo 101",
+    "address2": "Colonia Parque industrial del valle de Aguascalientes",
+    "postalCode": "20140",
+    "city": "Aguascalientes",
+    "country": "México",
+    "reference": "Empresa llamada Tachi-s, entre calle circuito Aguscalientes y municipio de tepezala",
+    "default": false
+  }
+]

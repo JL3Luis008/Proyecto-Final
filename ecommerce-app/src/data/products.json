@@ -1,0 +1,345 @@
+[
+  {
+    "_id": "68b0p001",
+    "name": "Super Nintendo",
+    "description": "Consola en buen estado con juego de super mario world.",
+    "price": 1500,
+    "stock": 2,
+    "imagesUrl": ["/img/products/Super Nintendo 01.png"],
+    "category": {
+      "_id": "catc001",
+      "name": "Consolas",
+      "description": "Consolas antiguas para videojuegos clásicos",
+      "imageURL": "../",
+      "parentCategory": {
+        "_id": "pc001",
+        "name": "Consolas",
+        "description": "Consolas retro de colección",
+        "imageURL": "https://placehold.co/800x600.png",
+        "parentCategory": null
+      }
+    }
+  },
+  {
+    "_id": "68b0p002",
+    "name": "Nintendo 64",
+    "description": "Consola nintendo 64 negra con 1 control.",
+    "price": 2000,
+    "stock": 1,
+    "imagesUrl": ["/img/products/Nintendo 64 01.jpg"],
+    "category": {
+      "_id": "catc001",
+      "name": "Consolas",
+      "description": "Consolas antiguas para videojuegos clásicos",
+      "imageURL": "https://placehold.co/800x600.png",
+      "parentCategory": {
+        "_id": "pc001",
+        "name": "Consolas",
+        "description": "Consolas retro de colección",
+        "imageURL": "https://placehold.co/800x600.png",
+        "parentCategory": null
+      }
+    }
+  },
+  {
+    "_id": "68b0p004",
+    "name": "PlayStation 1",
+    "description": "Consola ps1 blanca en buen estado con control .",
+    "price": 1500,
+    "stock": 2,
+    "imagesUrl": ["/img/products/ps1.webp"],
+    "category": {
+      "_id": "catc001",
+      "name": "Consolas",
+      "description": "Consolas antiguas para videojuegos clásicos",
+      "imageURL": "https://placehold.co/800x600.png",
+      "parentCategory": {
+        "_id": "pc001",
+        "name": "Consolas",
+        "description": "Consolas retro de colección",
+        "imageURL": "https://placehold.co/800x600.png",
+        "parentCategory": null
+      }
+    }
+  },
+  {
+    "_id": "68b0p005",
+    "name": "GameCube",
+    "description": "Consola morada Nintendo Game cube.",
+    "price": 2000,
+    "stock": 1,
+    "imagesUrl": ["/img/products/gamecube.jpg"],
+    "category": {
+      "_id": "catc001",
+      "name": "Consolas Retro",
+      "description": "Consolas antiguas para videojuegos clásicos",
+      "imageURL": "https://placehold.co/800x600.png",
+      "parentCategory": {
+        "_id": "pc001",
+        "name": "Consolas",
+        "description": "Consolas retro de colección",
+        "imageURL": "https://placehold.co/800x600.png",
+        "parentCategory": null
+      }
+    }
+  },
+  {
+    "_id": "68b0p006",
+    "name": "Dreamcast",
+    "description": "Consola Sega color blanca en excelent estado.",
+    "price": 3000,
+    "stock": 1,
+    "imagesUrl": ["/img/products/dreamcast.webp"],
+    "category": {
+      "_id": "catc001",
+      "name": "Consolas Retro",
+      "description": "Consolas antiguas para videojuegos clásicos",
+      "imageURL": "https://placehold.co/800x600.png",
+      "parentCategory": {
+        "_id": "pc001",
+        "name": "Consolas",
+        "description": "Consolas retro de colección",
+        "imageURL": "https://placehold.co/800x600.png",
+        "parentCategory": null
+      }
+    }
+  },
+  {
+    "_id": "68b0p009",
+    "name": "Game Boy Color",
+    "description": "Consola portátil a color morado translucido de Nintendo.",
+    "price": 1500,
+    "stock": 2,
+    "imagesUrl": ["/img/products/gbc.avif"],
+    "category": {
+      "_id": "catc001",
+      "name": "Consolas Retro",
+      "description": "Consolas antiguas para videojuegos clásicos",
+      "imageURL": "https://placehold.co/800x600.png",
+      "parentCategory": {
+        "_id": "pc001",
+        "name": "Consolas",
+        "description": "Consolas retro de colección",
+        "imageURL": "https://placehold.co/800x600.png",
+        "parentCategory": null
+      }
+    }
+  }
+  ,
+  {
+    "_id": "68b0p009",
+    "name": "nintendo ds azul",
+    "description": "Consola portatil azul y negro de nintendo de doble pantalla con puerto para juegos de gameboy.",
+    "price": 1800,
+    "stock": 1,
+    "imagesUrl": ["/img/products/nds.webp"],
+    "category": {
+      "_id": "catc001",
+      "name": "Consolas Retro",
+      "description": "Consolas antiguas para videojuegos clásicos",
+      "imageURL": "https://placehold.co/800x600.png",
+      "parentCategory": {
+        "_id": "pc001",
+        "name": "Consolas",
+        "description": "Consolas retro de colección",
+        "imageURL": "https://placehold.co/800x600.png",
+        "parentCategory": null
+      }
+    }
+  },
+  {
+    "_id": "68b0p010",
+    "name": "Game Boy Advance SP",
+    "description": "Consola portátil azul de nintendo en buen estado, pantalla retro-iluminada.",
+    "price": 1500,
+    "stock": 2,
+    "imagesUrl": ["/img/products/gba-sp.webp"],
+    "category": {
+      "_id": "catc001",
+      "name": "Consolas Retro",
+      "description": "Consolas antiguas para videojuegos clásicos",
+      "imageURL": "https://placehold.co/800x600.png",
+      "parentCategory": {
+        "_id": "pc001",
+        "name": "Consolas",
+        "description": "Consolas retro de colección",
+        "imageURL": "https://placehold.co/800x600.png",
+        "parentCategory": null
+      }
+    }
+  },
+  {
+    "_id": "68b0p011",
+    "name": "PlayStation 2 slim",
+    "description": "Consola ps2 slim de sony color negro más vendida de la historia.",
+    "price": 1500,
+    "stock": 2,
+    "imagesUrl": ["/img/products/ps2.webp"],
+    "category": {
+      "_id": "catc001",
+      "name": "Consolas Retro",
+      "description": "Consolas antiguas para videojuegos clásicos",
+      "imageURL": "https://placehold.co/800x600.png",
+      "parentCategory": {
+        "_id": "pc001",
+        "name": "Consolas",
+        "description": "Consolas retro de colección",
+        "imageURL": "https://placehold.co/800x600.png",
+        "parentCategory": null
+      }
+    }
+  },
+  
+
+
+  {
+    "_id": "68b0p014",
+    "name": "Super Mario World",
+    "description": "Clásico juego de plataforma de mario bros para SNES.",
+    "price": 400,
+    "stock": 4,
+    "imagesUrl": ["/img/products/smw.jpg"],
+    "category": {
+      "_id": "catv001",
+      "name": "Videojuegos Retro",
+      "description": "Juegos clásicos de consola",
+      "imageURL": "https://placehold.co/800x600.png",
+      "parentCategory": null
+    }
+  },
+  {
+    "_id": "68b0p015",
+    "name": "The Legend of Zelda: Majoras mask",
+    "description": "Aventura épica de link para Nintendo 64.",
+    "price": 2000,
+    "stock": 1,
+    "imagesUrl": ["/img/products/tloztmm.jpg"],
+    "category": {
+      "_id": "catv001",
+      "name": "Videojuegos Retro",
+      "description": "Juegos clásicos de consola",
+      "imageURL": "https://placehold.co/800x600.png",
+      "parentCategory": null
+    }
+  },
+  {
+    "_id": "68b0p016",
+    "name": "Super Mario Kart",
+    "description": "Juego de carreras de mario para SNES.",
+    "price": 600,
+    "stock": 1,
+    "imagesUrl": ["/img/products/smk.jpg"],
+    "category": {
+      "_id": "catv001",
+      "name": "Videojuegos Retro",
+      "description": "Juegos clásicos de consola",
+      "imageURL": "https://placehold.co/800x600.png",
+      "parentCategory": null
+    }
+  },
+  {
+    "_id": "68b0p017",
+    "name": "Kid Dracula",
+    "description": "Aventura de kid dracula para Gameboy.",
+    "price": 4500,
+    "stock": 1,
+    "imagesUrl": ["/img/products/kidDracula.webp"],
+    "category": {
+      "_id": "catv001",
+      "name": "Videojuegos Retro",
+      "description": "Juegos clásicos de consola",
+      "imageURL": "https://placehold.co/800x600.png",
+      "parentCategory": null
+    }
+  },
+  {
+    "_id": "68b0p019",
+    "name": "Super Mario 64",
+    "description": "juego de aventura de mario para Nintendo 64.",
+    "price": 500,
+    "stock": 1,
+    "imagesUrl": ["/img/products/sm64.jpg"],
+    "category": {
+      "_id": "catv001",
+      "name": "Videojuegos Retro",
+      "description": "Juegos clásicos de consola",
+      "imageURL": "https://placehold.co/800x600.png",
+      "parentCategory": null
+    }
+  },
+  {
+    "_id": "68b0p020",
+    "name": "Mega Man X",
+    "description": "Acción intensa para SNES.",
+    "price": 600,
+    "stock": 1,
+    "imagesUrl": ["/img/products/mmx.jpg"],
+    "category": {
+      "_id": "catv001",
+      "name": "Videojuegos Retro",
+      "description": "Juegos clásicos de consola",
+      "imageURL": "https://placehold.co/800x600.png",
+      "parentCategory": null
+    }
+  },
+  {
+    "_id": "68b0p021",
+    "name": "Mario kart 64",
+    "description": "juego de Carreras de personajes de mario bros para nintendo 64.",
+    "price": 1200,
+    "stock": 1,
+    "imagesUrl": ["/img/products/mk64.webp"],
+    "category": {
+      "_id": "catv001",
+      "name": "Videojuegos Retro",
+      "description": "Juegos clásicos de consola",
+      "imageURL": "https://placehold.co/800x600.png",
+      "parentCategory": null
+    }
+  },
+  {
+    "_id": "68b0p024",
+    "name": "Metal Gear Solid",
+    "description": "Juego de sigilo para PS1.",
+    "price": 1200,
+    "stock": 1,
+    "imagesUrl": ["/img/products/mgs1.jpg"],
+    "category": {
+      "_id": "catv001",
+      "name": "Videojuegos Retro",
+      "description": "Juegos clásicos de consola",
+      "imageURL": "https://placehold.co/800x600.png",
+      "parentCategory": null
+    }
+  },
+  {
+    "_id": "68b0p025",
+    "name": "Pokémon fireRed Version",
+    "description": "Remake de pokemon red con caja y dispositivo wireless.",
+    "price": 4500,
+    "stock": 1,
+    "imagesUrl": ["/img/products/prf.webp"],
+    "category": {
+      "_id": "catv001",
+      "name": "Videojuegos Retro",
+      "description": "Juegos clásicos de consola",
+      "imageURL": "https://placehold.co/800x600.png",
+      "parentCategory": null
+    }
+  },
+  {
+    "_id": "68b0p026",
+    "name": "super mario sunshine",
+    "description": "juego de aventura de mario bros para Nintendo game cube.",
+    "price": 500,
+    "stock": 2,
+    "imagesUrl": ["/img/products/sms.jpg"],
+    "category": {
+      "_id": "catv001",
+      "name": "Videojuegos Retro",
+      "description": "Juegos clásicos de consola",
+      "imageURL": "https://placehold.co/800x600.png",
+      "parentCategory": null
+    }
+  }
+]

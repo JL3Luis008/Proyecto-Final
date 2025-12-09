@@ -1,0 +1,28 @@
+[
+    {
+        "_id": "690eb4b4f62bb3fb3e9947f3",
+        "alias": "Nu",
+        "userId": "67fc9bda370302bf46079352",
+        "type": "Debit_card",
+        "cardNumber": "4341-3257-1475-2547",
+        "cardHolderName": "José Lara",
+        "expiryDate": "08/31",
+        "cvv": "123",
+        "isDefault": false,
+        "isActive": true,
+        "__v": 0
+    },
+    {
+        "_id": "691262743278bbc102261a4a",
+        "alias": "BBVA",
+        "userId": "67fc9bda370302bf46079352",
+        "type": "credit_card",
+        "cardNumber": "9847-1468-4447-5355",
+        "placeHolder": "José Lara",
+        "expiryDate": "07/30",
+        "cvv": "123",
+        "isDefault": true,
+        "isActive": true,
+        "__v": 0
+    }
+]
