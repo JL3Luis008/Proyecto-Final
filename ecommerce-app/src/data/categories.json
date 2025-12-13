@@ -1,55 +1,132 @@
 [
+  
+  {
+    "_id": "68c396f6a24a7edc4231c9e1",
+    "name": "Nintendo",
+    "description": "Nintendo company",
+    "imageURL": ["/img/products/NintendoLogo.png"],
+    "parentCategory": null
+  }
+  ,
   {
     "_id": "68c396f6a24a7edc4233c9e5",
-    "name": "consolas",
+    "name": "Consolas",
     "description": "Consolas de videojuegos",
     "imageURL": "https://placehold.co/800x600.png",
     "parentCategory": {
-      "_id": "68c396f6a24a7edc4233c9db",
-      "name": "consolas",
-      "description": "Consolas de videojuegos",
-      "imageURL": "https://placehold.co/800x600.png",
+      "_id": "68c396f6a24a7edc4231c9e1",
+      "name": "Nintendo",
+      "description": "Nintendo company",
+      "imageURL": ["/img/products/NintendoLogo.png"],
       "parentCategory": null
     }
-  },
+  }
+   ,
   {
-    "_id": "68c396f6a24a7edc4233c9eb",
-    "name": "video juegos",
-    "description": "video juegos retro",
+    "_id": "68c396f6a24a7edc4223c9e5",
+    "name": "VideoJuegos",
+    "description": "videojuegos de Nintendo",
     "imageURL": "https://placehold.co/800x600.png",
     "parentCategory": {
-      "_id": "68c396f6a24a7edc4233c9e1",
-      "name": "video juegos",
-      "description": "video juegos",
-      "imageURL": "https://placehold.co/800x600.png",
-      "parentCategory": null
-    }
-  },
-   {
-    "_id": "68c396f6a24a7edc4233c9eb",
-    "name": "Nintendo",
-    "description": "video juegos de Nintendo",
-    "imageURL": "https://placehold.co/800x600.png",
-    "parentCategory": {
-      "_id": "68c396f6a24a7edc4233c9e1",
-      "name": "video juegos",
-      "description": "video juegos",
-      "imageURL": "https://placehold.co/800x600.png",
+      "_id": "68c396f6a24a7edc4231c9e1",
+      "name": "Nintendo",
+      "description": "Nintendo company",
+      "imageURL": ["/img/products/NintendoLogo.png"],
       "parentCategory": null
     }
   }
   ,
-   {
-    "_id": "68c396f6a24a7edc4233c9eb",
-    "name": "Nintendo",
-    "description": "Consolas de Nintendo",
+    {
+    "_id": "68c396f6a24a7edc4145c9e5",
+    "name": "Coleccionables",
+    "description": "Coleccionables de Nintendo",
     "imageURL": "https://placehold.co/800x600.png",
     "parentCategory": {
-      "_id": "68c396f6a24a7edc4233c9e1",
-      "name": "consolas",
-      "description": "Consolas de videojuegos",
-      "imageURL": "https://placehold.co/800x600.png",
+      "_id": "68c396f6a24a7edc4231c9e1",
+      "name": "Nintendo",
+      "description": "Nintendo company",
+      "imageURL": ["/img/products/NintendoLogo.png"],
       "parentCategory": null
     }
   }
+   ,
+    {
+    "_id": "68c396f6a24e7edc4143c9e5",
+    "name": "Gadgets",
+    "description": "Accesorios de Nintendo",
+    "imageURL": "https://placehold.co/800x600.png",
+    "parentCategory": {
+      "_id": "68c396f6a24a7edc4231c9e1",
+      "name": "Nintendo",
+      "description": "Nintendo company",
+      "imageURL": ["/img/products/NintendoLogo.png"],
+      "parentCategory": null
+    }
+  }
+  ,
+ {
+    "_id": "68c396f6a24a7edc4231c9e2",
+    "name": "PlayStation",
+    "description": "PlayStation company",
+    "imageURL": ["/img/products/PlaystationLogo.png"],
+    "parentCategory": null
+  }
+  ,
+  {
+    "_id": "68c396f6a24a7edc4233c9e5",
+    "name": "Consolas",
+    "description": "Consolas de videojuegos",
+    "imageURL": "https://placehold.co/800x600.png",
+    "parentCategory": {
+      "_id": "68c396f6a24a7edc4231c9e2",
+     "name": "PlayStation",
+     "description": "PlayStation company",
+     "imageURL": ["/img/products/PlaystationLogo.png"],
+     "parentCategory": null
+    }
+  }
+   ,
+  {
+    "_id": "68c396f6a2qa7edc4243c9e5",
+    "name": "VideoJuegos",
+    "description": "videojuegos de Nintendo",
+    "imageURL": "https://placehold.co/800x600.png",
+    "parentCategory": {
+      "_id": "68c396f6a24a7edc4231c9e2",
+     "name": "PlayStation",
+     "description": "PlayStation company",
+     "imageURL": ["/img/products/PlaystationLogo.png"],
+     "parentCategory": null
+    }
+  }
+  ,
+    {
+    "_id": "68c396f6a24w7edc4143c9e5",
+    "name": "Coleccionables",
+    "description": "Coleccionables de Nintendo",
+    "imageURL": "https://placehold.co/800x600.png",
+    "parentCategory": {
+      "_id": "68c396f6a24a7edc4231c9e2",
+     "name": "PlayStation",
+     "description": "PlayStation company",
+     "imageURL": ["/img/products/PlaystationLogo.png"],
+     "parentCategory": null
+    }
+  }
+   ,
+    {
+    "_id": "68c396f6a44a7edc4143c9e5",
+    "name": "Gadgets",
+    "description": "Accesorios de Nintendo",
+    "imageURL": "https://placehold.co/800x600.png",
+    "parentCategory": {
+      "_id": "68c396f6a24a7edc4231c9e2",
+     "name": "PlayStation",
+     "description": "PlayStation company",
+     "imageURL": ["/img/products/PlaystationLogo.png"],
+     "parentCategory": null
+    }
+  }
+
+  
 ]

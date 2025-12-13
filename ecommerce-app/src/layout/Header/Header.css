@@ -13,7 +13,7 @@
 }
 
 .header-content {
-  display: grid;
+  display:flex;
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: clamp(12px, 2vw, 20px);
@@ -30,6 +30,12 @@
   transition: opacity 0.2s;
 }
 
+.logo img {
+  margin: -30px;
+  height: 150px;
+  width: 200px;
+}
+
 .logo-extension {
   font-weight: 400;
   opacity: 0.9;
@@ -43,8 +49,9 @@
 
 /* Search */
 .search-container {
-  max-width: 600px;
-  width: 100%;
+  max-width: 800px;
+  width: 800px;
+  padding-left: 50px;
 
 }
 
@@ -54,6 +61,7 @@
   border: 2px solid transparent;
   border-radius: 40px;
   overflow: hidden;
+  width: 400px;
   transition: all 0.2s;
 }
 

@@ -7,6 +7,7 @@ import "./Navigation.css";
 const Navigation = ({ isMobile = false, onLinkClick }) => {
   const [categories, setCategories] = useState([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [openCategoryId, setOpenCategoryId] = useState(null);
 
   useEffect(() => {
     // Obtener categorías principales (que son parent de otras categorías)
@@ -38,20 +39,20 @@ const Navigation = ({ isMobile = false, onLinkClick }) => {
       <div className="mobile-navigation">
         {/* Ofertas especiales */}
         <Link
-          to="/offers"
+          to="/videogames"
           className="mobile-nav-link special"
           onClick={onLinkClick}
         >
           <Icon name="tag" size={20} />
-          video juegos
+          Videojuegos
         </Link>
         <Link
-          to="/new"
+          to="/consoles"
           className="mobile-nav-link special"
           onClick={onLinkClick}
         >
           <Icon name="sparkles" size={20} />
-          consolas
+          Consolas
         </Link>
         <Link
           to="/bestsellers"
@@ -95,49 +96,74 @@ const Navigation = ({ isMobile = false, onLinkClick }) => {
               <Icon name="chevronDown" size={14} />
             </button>
 
-            {isDropdownOpen && (
-              <div className="categories-dropdown-menu">
-                {categories.map((category) => {
-                  const subcategories = getSubcategories(category._id);
-                  return (
-                    <div key={category._id} className="category-group">
-                      <Link
-                        to={`/category/${category._id}`}
-                        className="category-link main-category"
-                      >
-                        {category.name}
-                        {subcategories.length > 0 && (
-                          <Icon name="chevronRight" size={12} />
-                        )}
-                      </Link>
+{isDropdownOpen && (
+  <div className="categories-dropdown-menu">
+    {categories.map((category) => {
+      const subcategories = getSubcategories(category._id);
+      const isOpen = openCategoryId === category._id;
 
-                      {subcategories.length > 0 && (
-                        <div className="subcategories">
-                          {subcategories.map((subcat) => (
-                            <Link
-                              key={subcat._id}
-                              to={`/category/${subcat._id}`}
-                              className="category-link sub-category"
-                            >
-                              {subcat.name}
-                            </Link>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+      return (
+        <div key={category._id} className="category-group">
+
+          <div className="category-header">
+
+            {/* Link de la categoría (NO despliega subcategorías) */}
+            <Link
+              to={`/category/${category._id}`}
+              className="category-link main-category"
+            >
+              {category.name}
+            </Link>
+
+            {/* Flecha para abrir/cerrar subcategorías */}
+            {subcategories.length > 0 && (
+              <button
+                className="toggle-subcats-btn"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setOpenCategoryId(isOpen ? null : category._id);
+                }}
+              >
+                <Icon
+                  name={isOpen ? "chevronDown" : "chevronRight"}
+                  size={12}
+                />
+              </button>
             )}
+
+          </div>
+
+          {/* Subcategorías (solo visibles si se abre con la flecha) */}
+          {isOpen && subcategories.length > 0 && (
+            <div className="subcategories">
+              {subcategories.map((subcat) => (
+                <Link
+                  key={subcat._id}
+                  to={`/category/${subcat._id}`}
+                  className="category-link sub-category"
+                >
+                  {subcat.name}
+                </Link>
+              ))}
+            </div>
+          )}
+
+        </div>
+      );
+    })}
+  </div>
+)}
+
           </div>
 
           {/* Navegación horizontal */}
           <nav className="categories-nav">
             <Link to="/offers" className="nav-link special">
-              video juegos
+              Videojuegos
             </Link>
             <Link to="/new" className="nav-link special">
-              consolas
+              Consolas
             </Link>
             <Link to="/bestsellers" className="nav-link special">
               Más vendidos

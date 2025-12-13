@@ -20,5 +20,16 @@
     "country": "México",
     "reference": "Empresa llamada Tachi-s, entre calle circuito Aguscalientes y municipio de tepezala",
     "default": false
+  },
+  {
+    "_id": "691262744278bbc102261a4a",
+    "name": "casa",
+    "address1": "Calle cadiz 123",
+    "address2": "Colonia España",
+    "postalCode": "20210",
+    "city": "Aguascalientes",
+    "country": "México",
+    "reference": "Entre calle Zamora y España",
+    "default": true
   }
 ]

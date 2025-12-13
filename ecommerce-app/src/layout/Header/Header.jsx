@@ -207,8 +207,7 @@ export default function Header() {
             </button>
             {/* Logo */}
             <Link to="/" className="logo">
-              Retro-Bits
-              <span className="logo-extension">.com</span>
+              <img src="/img/Retro-bits-2.png" alt="" />
             </Link>
             {/* Desktop Search */}
             <div className="search-container desktop-only">
@@ -234,7 +233,7 @@ export default function Header() {
               {/* Mobile Search Button */}
               <button
                 className="mobile-search-trigger mobile-only"
-                aria-label="Buscar"
+                aria-label="Buscar..."
                 onClick={handleMobileSearchToggle}
               >
                 <Icon name="search" size={20} />
@@ -273,9 +272,8 @@ export default function Header() {
                   <Icon
                     name="chevronDown"
                     size={14}
-                    className={`dropdown-arrow ${
-                      isUserMenuOpen ? "rotated" : ""
-                    }`}
+                    className={`dropdown-arrow ${isUserMenuOpen ? "rotated" : ""
+                      }`}
                   />
                 </button>
 
@@ -297,7 +295,7 @@ export default function Header() {
                           Iniciar Sesión
                         </Link>
                         <Link
-                        to="/account"
+                          to="/account"
                           className="auth-btn secondary"
                           onClick={handleRegister}
                         >
