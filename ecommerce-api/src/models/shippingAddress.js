@@ -1,9 +1,9 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const shippingAddressSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "User",
     required: true,
   },
   name: {
@@ -36,7 +36,7 @@ const shippingAddressSchema = new mongoose.Schema({
   country: {
     type: String,
     required: true,
-    default: 'México',
+    default: "México",
     trim: true,
   },
   phone: {
@@ -50,11 +50,11 @@ const shippingAddressSchema = new mongoose.Schema({
   },
   addressType: {
     type: String,
-    enum: ['home', 'work', 'other'],
-    default: 'home',
+    enum: ["home", "work", "other"],
+    default: "home",
   },
 });
 
-const ShippingAddress = mongoose.model('ShippingAddress', shippingAddressSchema);
+const ShippingAddress = mongoose.model("ShippingAddress", shippingAddressSchema);
 
 export default ShippingAddress;

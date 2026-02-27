@@ -1,203 +1,160 @@
 import express from "express";
 import { body, param, query } from "express-validator";
-import validate from "../middlewares/validation.js";
 import {
-  getUserProfile,
+  changePassword,
+  createUser,
+  deactivateUser,
+  deleteUser,
   getAllUsers,
   getUserById,
-  updateUserProfile,
-  changePassword,
-  updateUser,
-  deactivateUser,
+  getUserProfile,
+  searchUser,
   toggleUserStatus,
-  deleteUser,
-  searchUsers,
+  updateUser,
+  updateUserProfile,
 } from "../controllers/userController.js";
-import authMiddleware from '../middlewares/authMiddleware.js';
-import isAdministrator from "../middlewares/isAdministratorMiddleware.js"; // Middleware de Administrator
-
+import authMiddleware from "../middlewares/authMiddleware.js"; // Middleware de autenticación
+import isAdmin from "../middlewares/isAdminMiddleware.js"; // Middleware de admin
+import validate from "../middlewares/validation.js";
+import {
+  displayNameValidation,
+  emailValidation,
+  passwordValidation,
+  phoneValidation,
+  urlValidation,
+  paginationValidation,
+  mongoIdValidation,
+  roleValidation,
+  booleanValidation,
+  userDisplayNameValidation,
+  fullPasswordValidation,
+  newPasswordValidation,
+  confirmPasswordValidation,
+  queryRoleValidation,
+  queryIsActiveValidation,
+  searchQueryValidation,
+  sortFieldValidation,
+  orderValidation,
+} from "../middlewares/validators.js";
 
 const router = express.Router();
- 
+
 // Validaciones comunes para actualizar perfil
 const profileValidations = [
-  body("displayName")
-    .optional()
-    .isLength({ min: 2, max: 50 })
-    .withMessage("Display name must be between 2 and 50 characters")
-    .matches(/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s]+$/)
-    .withMessage("Display name must contain only letters, numbers and spaces")
-    .trim(),
-
-  body("email")
-    .optional()
-    .isEmail()
-    .withMessage("Valid email is required")
-    .normalizeEmail(),
-
-  body("phone")
-    .optional()
-    .isLength({ min: 10, max: 10 })
-    .withMessage("Phone must be exactly 10 digits")
-    .isNumeric()
-    .withMessage("Phone must contain only numbers"),
-
-  body("avatar").optional().isURL().withMessage("Avatar must be a valid URL"),
+  userDisplayNameValidation(false),
+  emailValidation(true),
+  phoneValidation(),
+  urlValidation("avatar"),
 ];
 
 // Obtener perfil del usuario autenticado
-router.get("/user/profile", authMiddleware, getUserProfile);
+router.get("/users/profile", authMiddleware, getUserProfile);
 
-router.get(
-  "/user/search",
-  [
-    query("page")
-      .optional()
-      .isInt({ min: 1 })
-      .withMessage("el valor debe ser un numero entero"),
-    query("limit")
-      .optional()
-      .isInt({ min: 1 })
-      .withMessage("el limite debe ser un entero positivo"),
-  ],
-  searchUsers
-);
-
-// Obtener todos los usuarios (solo Administrator)
+// Obtener todos los usuarios (solo admin)
 router.get(
   "/users",
-  [
-    query("page")
-      .optional()
-      .isInt({ min: 1 })
-      .withMessage("Page must be a positive integer"),
-
-    query("limit")
-      .optional()
-      .isInt({ min: 1, max: 100 })
-      .withMessage("Limit must be between 1 and 100"),
-
-    query("role")
-      .optional()
-      .isIn(['Administrator', 'customer', 'guest'])
-      .withMessage("Role must be Administrator, customer, or guest"),
-
-    query("isActive")
-      .optional()
-      .isBoolean()
-      .withMessage("isActive must be a boolean value"),
-  ],
-  validate,
   authMiddleware,
-  isAdministrator,
+  isAdmin,
+  [...paginationValidation(), queryRoleValidation(), queryIsActiveValidation()],
+  validate,
   getAllUsers
 );
 
-// Obtener usuario por ID (solo Administrator)
+// Buscar usuarios (requiere autenticación)
 router.get(
-  "/user/:userId",
+  "/users/search",
+  authMiddleware,
   [
-    param("userId")
-      .isMongoId()
-      .withMessage("User ID must be a valid MongoDB ObjectId"),
+    searchQueryValidation(),
+    ...paginationValidation(),
+    queryRoleValidation(),
+    queryIsActiveValidation(),
+    sortFieldValidation(["email", "displayName", "createdAt"]),
+    orderValidation(),
   ],
   validate,
+  searchUser
+);
+
+// Obtener usuario por ID (solo admin)
+router.get(
+  "/users/:userId",
   authMiddleware,
-  isAdministrator,
+  isAdmin,
+  [mongoIdValidation("userId", "User ID")],
+  validate,
   getUserById
 );
 
-// Actualizar perfil del usuario
-router.put(
-  "/user/profile",
-  profileValidations,
-  validate,
+// Crear nuevo usuario (solo admin)
+router.post(
+  "/users",
   authMiddleware,
-  updateUserProfile
-);
-
-// Cambiar contraseña
-router.put(
-  "/user/change-password",
+  isAdmin,
   [
-    body("currentPassword")
-      .notEmpty()
-      .withMessage("Current password is required"),
-
-    body("newPassword")
-      .isLength({ min: 6 })
-      .withMessage("New password must be at least 6 characters long")
-      .matches(/\d/)
-      .withMessage("New password must contain at least one number")
-      .matches(/[a-zA-Z]/)
-      .withMessage("New password must contain at least one letter"),
-
-    body("confirmPassword").custom((value, { req }) => {
-      if (value !== req.body.newPassword) {
-        throw new Error("Password confirmation does not match new password");
-      }
-      return true;
-    }),
+    userDisplayNameValidation(true),
+    emailValidation(),
+    fullPasswordValidation(),
+    phoneValidation(),
+    urlValidation("avatar"),
+    roleValidation(),
+    booleanValidation("isActive"),
   ],
   validate,
+  createUser
+);
+
+// Actualizar perfil del usuario (requiere autenticación)
+router.put("/users/profile", authMiddleware, profileValidations, validate, updateUserProfile);
+
+// Cambiar contraseña (requiere autenticación)
+router.put(
+  "/users/change-password",
   authMiddleware,
+  [
+    body("currentPassword").notEmpty().withMessage("Current password is required"),
+    newPasswordValidation(),
+    confirmPasswordValidation(),
+  ],
+  validate,
   changePassword
 );
 
-// Actualizar usuario (solo Administrator)
+// Actualizar usuario (solo admin)
 router.put(
-  "/user/:userId",
+  "/users/:userId",
+  authMiddleware,
+  isAdmin,
   [
-    param("userId")
-      .isMongoId()
-      .withMessage("User ID must be a valid MongoDB ObjectId"),
-
+    mongoIdValidation("userId", "User ID"),
     ...profileValidations,
-
-    body("role")
-      .optional()
-      .isIn(["Administrator", "Customer", "Guest"])
-      .withMessage("Role must be Administrator, customer, or guest"),
-
-    body("isActive")
-      .optional()
-      .isBoolean()
-      .withMessage("isActive must be a boolean value"),
+    roleValidation(),
+    booleanValidation("isActive"),
   ],
   validate,
-  authMiddleware,
-  isAdministrator,
   updateUser
 );
- 
-// Desactivar cuenta propia
-router.patch("/user/deactivate", authMiddleware, deactivateUser);
 
-// Activar/Desactivar usuario (solo Administrator)
+// Desactivar cuenta propia
+router.patch("/users/deactivate", authMiddleware, deactivateUser);
+
+// Activar/Desactivar usuario (solo admin)
 router.patch(
-  "/user/:userId/toggle-status",
-  [
-    param("userId")
-      .isMongoId()
-      .withMessage("User ID must be a valid MongoDB ObjectId"),
-  ],
-  validate,
+  "/users/:userId/toggle-status",
   authMiddleware,
-  isAdministrator,
+  isAdmin,
+  [mongoIdValidation("userId", "User ID")],
+  validate,
   toggleUserStatus
 );
 
-// Eliminar usuario (solo Administrator)
+// Eliminar usuario (solo admin)
 router.delete(
-  "/user/:userId",
-  [
-    param("userId")
-      .isMongoId()
-      .withMessage("User ID must be a valid MongoDB ObjectId"),
-  ],
-  validate,
+  "/users/:userId",
   authMiddleware,
-  isAdministrator,
+  isAdmin,
+  [mongoIdValidation("userId", "User ID")],
+  validate,
   deleteUser
 );
 

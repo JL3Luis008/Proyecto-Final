@@ -1,4 +1,4 @@
-import { getCurrentUser } from "../../utils/auth";
+import { useAuth } from "../../context/AuthContext";
 import Button from "../common/Button";
 import "./ProfileCard.css";
 
@@ -21,8 +21,9 @@ const ROLE_ACTIONS = {
   ],
 };
 
-export default function ProfileCard({ user }) {
-  const currentUser = user || getCurrentUser();
+export default function ProfileCard() {
+  const { user } = useAuth();
+  const currentUser = user;
   const role = currentUser.role || "guest";
   const actions = ROLE_ACTIONS[role] || [];
 

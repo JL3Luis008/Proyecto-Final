@@ -10,16 +10,16 @@ const PaymentItem = ({ payment, isSelected, onSelect, onEdit, onDelete }) => {
   return (
     <div
       className={`payment-item ${isSelected ? "selected" : ""} ${
-        payment.isDefault ? "isDefault" : ""
+        payment.isDefault ? "default" : ""
       }`}
     >
       <div className="payment-content">
         <h4>{payment.alias}</h4>
         <p>{maskCardNumber(payment.cardNumber)}</p>
-        <p>Vence: {payment.expiryDate}</p>
+        <p>Vence: {payment.expireDate}</p>
         <p>Titular: {payment.placeHolder}</p>
         {payment.isDefault && (
-          <span className="isDefault-badge">Predeterminada</span>
+          <span className="default-badge">Predeterminada</span>
         )}
       </div>
       <div className="payment-actions">
@@ -29,7 +29,7 @@ const PaymentItem = ({ payment, isSelected, onSelect, onEdit, onDelete }) => {
         <Button variant="secondary" onClick={() => onEdit(payment)}>
           Editar
         </Button>
-        <Button variant="danger" onClick={() => onDelete(payment)}>
+        <Button variant="danger" onClick={() => onDelete(payment.id)}>
           Eliminar
         </Button>
       </div>

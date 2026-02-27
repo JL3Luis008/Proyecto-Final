@@ -3,7 +3,7 @@ import errorHandler from '../middlewares/errorHandler.js';
 
 
 
-async function getProducts(req, res) {
+async function getProducts(req, res, next) {
   try {
    // req.params
   // req.query
@@ -34,7 +34,7 @@ const skip = (page - 1)*limit;
     next(error);
   }
 }
-async function getProductById(req, res) {
+async function getProductById(req, res, next) {
   try {
     const id = req.params.id;
     const product = await Product.findById(id).populate('category');
@@ -47,7 +47,7 @@ async function getProductById(req, res) {
   }
 }
 
-async function getProductByCategory(req, res) {
+async function getProductByCategory(req, res, next ) {
   try {
     const id = req.params.idCategory;
     const products = await Product
@@ -63,24 +63,24 @@ async function getProductByCategory(req, res) {
   }
 }
 
-async function createProduct(req, res) {
+async function createProduct(req, res, next) {
   try {
-    const { name, description, console, price, stock, imagesUrl, category } = req.body;
+    const { name, description, company, price, stock, imagesUrl, category } = req.body;
 
 if (!name) return res.status(400).json({ error: 'Name is required' });
 if (!description) return res.status(400).json({ error: 'Description is required' });
-if (!console) return res.status(400).json({ error: 'Console is required' });
+if (!company) return res.status(400).json({ error: 'company is required' });
 if (!price) return res.status(400).json({ error: 'Price is required' });
 if (!stock) return res.status(400).json({ error: 'Stock is required' });
 if (!imagesUrl) return res.status(400).json({ error: 'Images URL is required' });
 
-    const newProduct = await Product.create({ name, description, console, price, stock, imagesUrl, category });
+    const newProduct = await Product.create({ name, description, company, price, stock, imagesUrl, category });
     res.status(201).json(newProduct);
   } catch (error) {
     next(error);
   }
 }
-async function updateProduct(req, res) {
+async function updateProduct(req, res, next ) {
   try {
     const id = req.params.id;
     const { name, description, console, price, stock, imagesUrl, category } = req.body;
@@ -105,7 +105,7 @@ if (!imagesUrl) return res.status(400).json({ error: 'Images URL is required' })
     next(error);
   }
 }
-async function deleteProduct(req, res) {
+async function deleteProduct(req, res, next ) {
   try {
     const id = req.params.id;
     const deletedProduct = await Product.findByIdAndDelete(id);

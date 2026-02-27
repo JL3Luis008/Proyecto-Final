@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { fetchProducts } from "../../services/productService";
+//import { fetchProducts } from "../../services/productService";
 import List from "../List/List";
 import "./SearchResultsList.css";
 
@@ -16,8 +16,8 @@ export default function SearchResultsList() {
     const loadProducts = async () => {
       try {
         setLoading(true);
-        const data = await fetchProducts();
-        if (isMounted) setProducts(data);
+        //const data = await fetchProducts();
+        if (isMounted) setProducts([]);
       } finally {
         if (isMounted) setLoading(false);
       }

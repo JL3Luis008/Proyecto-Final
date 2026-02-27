@@ -1,35 +1,47 @@
 import "./Input.css";
 
 export default function Input({
-  label,
-  type = "text",
-  value,
-  onChange,
-  placeholder = "",
-  disabled = false,
-  className = "",
   id,
-  ...rest
+  label,
+  name,
+  value,
+  type = "text",
+  placeholder = "",
+  onChange,
+  onBlur,
+  error,
+  showError,
+  autoComplete,
 }) {
-  const inputId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
+  const errorId = `${id}-error`;
+  const invalid = Boolean(showError && error);
+  const className = "";
 
   return (
     <div className={`input-group ${className}`}>
       {label && (
-        <label htmlFor={inputId} className="input-label">
+        <label htmlFor={id} className="input-label">
           {label}
         </label>
       )}
       <input
-        id={inputId}
+        id={id}
+        className={`formInput ${invalid} ? "isInvalid" : ""`}
+        name={name}
         type={type}
         value={value}
-        onChange={onChange}
         placeholder={placeholder}
-        disabled={disabled}
-        className="input-field"
-        {...rest}
+        onChange={onChange}
+        onBlur={onBlur}
+        autoComplete={autoComplete}
+        aria-invalid={invalid ? "true" : "false"}
+        aria-describedby={invalid ? errorId : undefined}
       />
+      {invalid ? (
+        <p className="formError" errorId>
+          {error}
+        </p>
+      ) : null}
     </div>
   );
 }

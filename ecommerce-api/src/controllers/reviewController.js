@@ -1,6 +1,5 @@
-import Review from '../models/review.js';
-import Product from '../models/product.js';
-import User from '../models/user.js';
+import Product from "../models/product.js";
+import Review from "../models/review.js";
 
 // Crear una nueva review
 const createReview = async (req, res, next) => {
@@ -11,30 +10,30 @@ const createReview = async (req, res, next) => {
     // Verificar que el producto existe
     const productExists = await Product.findById(product);
     if (!productExists) {
-      return res.status(404).json({ message: 'Product not found' });
+      return res.status(404).json({ message: "Product not found" });
     }
 
     // Verificar que el usuario no haya review este producto antes
     const existingReview = await Review.findOne({ user, product });
     if (existingReview) {
-      return res.status(400).json({ message: 'You have already reviewed this product' });
+      return res.status(400).json({ message: "You have already reviewed this product" });
     }
 
     const newReview = new Review({
       user,
       product,
       rating,
-      comment
+      comment,
     });
 
     await newReview.save();
 
     // Poblar la respuesta con datos del usuario
-    await newReview.populate('user', 'displayName');
+    await newReview.populate("user", "displayName");
 
     res.status(201).json({
-      message: 'Review created successfully',
-      review: newReview
+      message: "Review created successfully",
+      review: newReview,
     });
   } catch (error) {
     next(error);
@@ -47,13 +46,13 @@ const getProductReviews = async (req, res, next) => {
     const { productId } = req.params;
 
     const reviews = await Review.find({ product: productId })
-      .populate('user', 'displayName avatar')
+      .populate("user", "displayName avatar")
       .sort({ _id: -1 }); // Más recientes primero
 
     res.status(200).json({
-      message: 'Reviews retrieved successfully',
+      message: "Reviews retrieved successfully",
       count: reviews.length,
-      reviews
+      reviews,
     });
   } catch (error) {
     next(error);
@@ -66,13 +65,13 @@ const getUserReviews = async (req, res, next) => {
     const userId = req.user.userId;
 
     const reviews = await Review.find({ user: userId })
-      .populate('product', 'name price')
+      .populate("product", "name price")
       .sort({ _id: -1 });
 
     res.status(200).json({
-      message: 'User reviews retrieved successfully',
+      message: "User reviews retrieved successfully",
       count: reviews.length,
-      reviews
+      reviews,
     });
   } catch (error) {
     next(error);
@@ -86,25 +85,33 @@ const updateReview = async (req, res, next) => {
     const { rating, comment } = req.body;
     const userId = req.user.userId;
 
+    // Validar que al menos un campo esté presente
+    if (rating === undefined && comment === undefined) {
+      return res.status(400).json({
+        message: "At least one field (rating or comment) must be provided",
+      });
+    }
+
     const review = await Review.findById(reviewId);
     if (!review) {
-      return res.status(404).json({ message: 'Review not found' });
+      return res.status(404).json({ message: "Review not found" });
     }
 
     // Verificar que el usuario es el propietario de la review
     if (review.user.toString() !== userId) {
-      return res.status(403).json({ message: 'You can only update your own reviews' });
+      return res.status(403).json({ message: "You can only update your own reviews" });
     }
 
-    review.rating = rating;
-    review.comment = comment;
+    // Actualizar solo los campos proporcionados
+    if (rating !== undefined) review.rating = rating;
+    if (comment !== undefined) review.comment = comment;
 
     await review.save();
-    await review.populate('user', 'displayName');
+    await review.populate("user", "displayName");
 
     res.status(200).json({
-      message: 'Review updated successfully',
-      review
+      message: "Review updated successfully",
+      review,
     });
   } catch (error) {
     next(error);
@@ -119,28 +126,22 @@ const deleteReview = async (req, res, next) => {
 
     const review = await Review.findById(reviewId);
     if (!review) {
-      return res.status(404).json({ message: 'Review not found' });
+      return res.status(404).json({ message: "Review not found" });
     }
 
     // Verificar que el usuario es el propietario de la review
     if (review.user.toString() !== userId) {
-      return res.status(403).json({ message: 'You can only delete your own reviews' });
+      return res.status(403).json({ message: "You can only delete your own reviews" });
     }
 
     await Review.findByIdAndDelete(reviewId);
 
     res.status(200).json({
-      message: 'Review deleted successfully'
+      message: "Review deleted successfully",
     });
   } catch (error) {
     next(error);
   }
 };
 
-export {
-  createReview,
-  getProductReviews,
-  getUserReviews,
-  updateReview,
-  deleteReview
-};
+export { createReview, deleteReview, getProductReviews, getUserReviews, updateReview };

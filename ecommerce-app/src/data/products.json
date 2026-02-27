@@ -1,26 +1,5 @@
 [
   {
-    "_id": "68b0p001",
-    "name": "Super Nintendo",
-    "description": "Consola en buen estado con juego de super mario world.",
-    "price": 1500,
-    "stock": 2,
-    "imagesUrl": ["/img/products/Super Nintendo 01.png"],
-    "category": {
-      "_id": "catc001",
-      "name": "Consolas",
-      "description": "Consolas antiguas para videojuegos clásicos",
-      "imageURL": "../",
-      "parentCategory": {
-        "_id": "pc001",
-        "name": "Consolas",
-        "description": "Consolas retro de colección",
-        "imageURL": "https://placehold.co/800x600.png",
-        "parentCategory": null
-      }
-    }
-  },
-  {
     "_id": "68b0p002",
     "name": "Nintendo 64",
     "description": "Consola nintendo 64 negra con 1 control.",

@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import Icon from "../../components/common/Icon/Icon";
 import { useCart } from "../../context/CartContext";
 import { useTheme } from "../../context/ThemeContext";
-import { getCurrentUser, isAuthenticated, logout } from "../../utils/auth";
+import { useAuth } from "../../context/AuthContext";
 import Navigation from "../Navigation/Navigation";
 import "./Header.css";
 
@@ -16,29 +16,12 @@ export default function Header() {
   const { getTotalItems } = useCart();
   const totalItems = getTotalItems();
   const navigate = useNavigate();
-
-  // Simular estado de autenticación - reemplazar con tu lógica real
-  const [isAuth, setIsAuth] = useState(true);
-  const [user, setUser] = useState(getCurrentUser());
+  const { user, isAuth, logout } = useAuth();
 
   // Referencias para manejo de clicks fuera
   const userMenuRef = useRef(null);
   const mobileMenuRef = useRef(null);
   const searchInputRef = useRef(null);
-
-  useEffect(() => {
-    const updateAuthState = () => {
-      setIsAuth(isAuthenticated());
-      setUser(getCurrentUser());
-    };
-
-    window.addEventListener("storage", updateAuthState);
-    updateAuthState();
-
-    return () => {
-      window.addEventListener("storage", updateAuthState);
-    };
-  }, []);
 
   // Cerrar menús con Escape y clicks fuera
   useEffect(() => {
@@ -117,8 +100,6 @@ export default function Header() {
 
   const handleLogout = () => {
     logout();
-    setIsAuth(false);
-    setUser(null);
     setIsUserMenuOpen(false);
     setIsMobileMenuOpen(false);
     window.location.reload();
@@ -177,7 +158,7 @@ export default function Header() {
                 ref={searchInputRef}
                 type="text"
                 className="mobile-search-input"
-                placeholder="Buscar..."
+                placeholder="Buscar productos..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -207,7 +188,7 @@ export default function Header() {
             </button>
             {/* Logo */}
             <Link to="/" className="logo">
-              <img src="/img/Retro-bits-2.png" alt="" />
+              <img src="/img/Retro-bits.png" alt="Logo " />
             </Link>
             {/* Desktop Search */}
             <div className="search-container desktop-only">
@@ -215,7 +196,7 @@ export default function Header() {
                 <input
                   type="text"
                   className="search-input"
-                  placeholder="Buscar..."
+                  placeholder="Buscar productos..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                 />
@@ -233,7 +214,7 @@ export default function Header() {
               {/* Mobile Search Button */}
               <button
                 className="mobile-search-trigger mobile-only"
-                aria-label="Buscar..."
+                aria-label="Buscar"
                 onClick={handleMobileSearchToggle}
               >
                 <Icon name="search" size={20} />
@@ -262,7 +243,7 @@ export default function Header() {
                   <div className="user-text">
                     <span className="greeting">
                       {isAuth
-                        ? `Jugador:  ${getDisplayName(user)}`
+                        ? `Hola, ${getDisplayName(user)}`
                         : "Hola, Inicia sesión"}
                     </span>
                     <span className="account-text">
@@ -272,8 +253,9 @@ export default function Header() {
                   <Icon
                     name="chevronDown"
                     size={14}
-                    className={`dropdown-arrow ${isUserMenuOpen ? "rotated" : ""
-                      }`}
+                    className={`dropdown-arrow ${
+                      isUserMenuOpen ? "rotated" : ""
+                    }`}
                   />
                 </button>
 
@@ -294,14 +276,13 @@ export default function Header() {
                           <Icon name="logIn" size={16} />
                           Iniciar Sesión
                         </Link>
-                        <Link
-                          to="/account"
+                        <button
                           className="auth-btn secondary"
                           onClick={handleRegister}
                         >
                           <Icon name="userPlus" size={16} />
                           Crear Cuenta
-                        </Link>
+                        </button>
                       </div>
                     ) : (
                       <div className="user-section">
@@ -327,6 +308,10 @@ export default function Header() {
                           <Link to="/orders" className="user-link">
                             <Icon name="package" size={16} />
                             Mis Pedidos
+                          </Link>
+                          <Link to="/wishlist" className="user-link">
+                            <Icon name="heart" size={16} />
+                            Lista de Deseos
                           </Link>
                           <Link to="/settings" className="user-link">
                             <Icon name="settings" size={16} />
@@ -473,6 +458,14 @@ export default function Header() {
                   >
                     <Icon name="package" size={20} />
                     Mis Pedidos
+                  </Link>
+                  <Link
+                    to="/wishlist"
+                    className="mobile-nav-link"
+                    onClick={handleMobileMenuClose}
+                  >
+                    <Icon name="heart" size={20} />
+                    Lista de Deseos
                   </Link>
                   <Link
                     to="/settings"

@@ -1,92 +1,120 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useMemo,
+  useReducer,
+  useState,
+} from "react";
+import { useAuth } from "./AuthContext";
+import * as cartService from "../services/cartService";
+import { CART_ACTIONS, cartInitialState, cartReducer } from "./cartReducer";
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
-  // Inicializamos el estado con los datos del localStorage directamente
-  const [cartItems, setCartItems] = useState(() => {
-    const savedCart = localStorage.getItem("cart");
-    return savedCart ? JSON.parse(savedCart) : [];
+  const [state, dispatch] = useReducer(cartReducer, cartInitialState);
+
+  const [syncState, setSyncState] = useState({
+    syncing: false,
+    lastSyncError: null,
   });
 
-  // Calcular el total basado en los items del carrito
-  const calculateTotal = (items) => {
-    return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  };
+  const { isAuth, user } = useAuth();
 
-  // Mantener el total actualizado
-  const [total, setTotal] = useState(() => {
-    const savedCart = localStorage.getItem("cart");
-    const items = savedCart ? JSON.parse(savedCart) : [];
-    return calculateTotal(items);
-  });
+  // Funciones auxiliares:
+  const getTotalItems = () =>
+    state.items.reduce((sum, i) => sum + i.quantity, 0);
+  const getTotalPrice = () =>
+    state.items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
   // Actualizar localStorage cuando cambie el carrito
   useEffect(() => {
-    localStorage.setItem("cart", JSON.stringify(cartItems));
-    setTotal(calculateTotal(cartItems));
-  }, [cartItems]);
+    localStorage.setItem("cart", JSON.stringify(state.items));
+  }, [state.items]);
+
+  useEffect(() => {
+    const initializeCart = async () => {
+      if (isAuth && user?._id) {
+        try {
+          const backendCart = await cartService.getCart(user._id);
+          if (backendCart?.cart?.products) {
+            const flattenedItems = backendCart.cart.products.map((p) => ({
+              ...p.product,
+              quantity: p.quantity,
+            }));
+            dispatch({ type: CART_ACTIONS.INIT, payload: flattenedItems });
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    };
+
+    initializeCart();
+  }, [isAuth]);
+
+  const syncToBackend = async (syncFn) => {
+    if (!isAuth) return;
+
+    setSyncState({ syncing: true, lastSyncError: null });
+    try {
+      await syncFn();
+      setSyncState({ syncing: false, lastSyncError: null });
+    } catch (error) {
+      console.error(error);
+      setSyncState({ syncing: false, lastSyncError: error });
+    }
+  };
 
   const removeFromCart = (productId) => {
-    setCartItems((prevItems) =>
-      prevItems.filter((item) => item._id !== productId)
-    );
+    dispatch({ type: CART_ACTIONS.REMOVE, payload: productId });
+
+    syncToBackend(async () => {
+      await cartService.removeToCart(user._id, productId);
+    });
   };
 
   const updateQuantity = (productId, newQuantity) => {
-    if (newQuantity <= 0) {
-      removeFromCart(productId);
-      return;
-    }
+    dispatch({
+      type: CART_ACTIONS.SET_QTY,
+      payload: { _id: productId, quantity: newQuantity },
+    });
 
-    setCartItems((prevItems) =>
-      prevItems.map((item) =>
-        item._id === productId ? { ...item, quantity: newQuantity } : item
-      )
-    );
+    syncToBackend(async () => {
+      await cartService.updateCartItem(user._id, productId, newQuantity);
+    });
   };
 
   const addToCart = (product, quantity = 1) => {
-    setCartItems((prevItems) => {
-      const existingItem = prevItems.find((item) => item._id === product._id);
+    dispatch({ type: CART_ACTIONS.ADD, payload: { ...product, quantity } });
 
-      if (existingItem) {
-        return prevItems.map((item) =>
-          item._id === product._id
-            ? { ...item, quantity: item.quantity + quantity }
-            : item
-        );
-      } else {
-        return [...prevItems, { ...product, quantity }];
-      }
+    syncToBackend(async () => {
+      await cartService.addToCart(user._id, product._id, quantity);
     });
   };
 
   const clearCart = () => {
-    setCartItems([]);
+    dispatch({ type: CART_ACTIONS.CLEAR });
+
+    syncToBackend(async () => {
+      await cartService.clearCart(user._id);
+    });
   };
 
-  const getTotalItems = () => {
-    return cartItems.reduce((total, item) => total + item.quantity, 0);
-  };
-
-  const getTotalPrice = () => {
-    return cartItems.reduce(
-      (total, item) => total + item.price * item.quantity,
-      0
-    );
-  };
-
-  const value = {
-    cartItems,
-    total: getTotalPrice(),
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    clearCart,
-    getTotalItems,
-    getTotalPrice,
-  };
+  const value = useMemo(
+    () => ({
+      cartItems: state.items,
+      total: getTotalPrice(),
+      addToCart,
+      removeFromCart,
+      updateQuantity,
+      clearCart,
+      getTotalItems,
+      getTotalPrice,
+    }),
+    [state.items],
+  );
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

@@ -1,46 +1,35 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { login } from "../../utils/auth";
+import { useAuth } from "../../context/AuthContext";
 import Button from "../common/Button";
 import ErrorMessage from "../common/ErrorMessage/ErrorMessage";
 import Input from "../common/Input";
 import "./LoginForm.css";
 
-export default function LoginForm() {
+export default function LoginForm({ onSuccess }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const { login, loading } = useAuth();
 
   const onSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError("");
 
-    await new Promise((resolve) => setTimeout(resolve, 800));
     const result = await login(email, password);
-
     if (result.success) {
+      if (onSuccess) onSuccess();
       navigate("/");
-      window.location.reload();
     } else {
       setError(result.error);
     }
-
-    setLoading(false);
   };
 
   return (
     <div className="login-container">
       <div className="login-card">
         <h2>Iniciar Sesión</h2>
-        <div className="demo-users">
-          <h4>Ejemplo de:</h4>
-          <div className="user-demo">
-            <strong>Cliente:</strong> SebasLV@email.com / Sebas159
-          </div>
-        </div>
         <form className="login-form" onSubmit={onSubmit}>
           <div className="form-group">
             <Input

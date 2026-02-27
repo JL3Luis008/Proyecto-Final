@@ -1,49 +1,61 @@
-import PaymentMethod from '../models/paymentMethod.js';
-import errorHandler from '../middlewares/errorHandler.js';
+import PaymentMethod from "../models/paymentMethod.js";
 
-async function getPaymentMethods(req, res) {
+const assertCanManagePaymentMethod = (paymentMethod, user) => {
+  const ownerId =
+    typeof paymentMethod.user === "object" && paymentMethod.user !== null
+      ? paymentMethod.user._id?.toString()
+      : paymentMethod.user?.toString();
+  const isOwner = ownerId === user.userId;
+  if (!isOwner && user.role !== "admin") {
+    const error = new Error("You are not allowed to modify this payment method");
+    error.statusCode = 403;
+    throw error;
+  }
+};
+
+async function getPaymentMethods(req, res, next) {
   try {
-    const paymentMethods = await PaymentMethod.find({ isActive: true }).populate('user');
+    const paymentMethods = await PaymentMethod.find({
+      isActive: true,
+    }).populate("user");
     res.json(paymentMethods);
   } catch (error) {
     next(error);
   }
 }
 
-async function getPaymentMethodById(req, res) {
+async function getPaymentMethodById(req, res, next) {
   try {
     const id = req.params.id;
-    const paymentMethod = await PaymentMethod.findById(id).populate('user');
+    const paymentMethod = await PaymentMethod.findById(id).populate("user");
     if (!paymentMethod) {
-      return res.status(404).json({ message: 'Payment method not found' });
+      return res.status(404).json({ message: "Payment method not found" });
     }
+
+    assertCanManagePaymentMethod(paymentMethod, req.user);
     res.json(paymentMethod);
   } catch (error) {
     next(error);
   }
 }
 
-async function getPaymentMethodsByUser(req, res) {
+async function getPaymentMethodsByUser(req, res, next) {
   try {
-    const userId = req.params.userId;
+    const userId = req.user.userId;
     const paymentMethods = await PaymentMethod.find({
       user: userId,
-      isActive: true
-    }).populate('user');
+      isActive: true,
+    }).populate("user");
 
-    if (paymentMethods.length === 0) {
-      return res.status(404).json({ message: 'No payment methods found for this user' });
-    }
     res.json(paymentMethods);
   } catch (error) {
     next(error);
   }
 }
 
-async function createPaymentMethod(req, res) {
+async function createPaymentMethod(req, res, next) {
   try {
     const {
-      user,
       type,
       cardNumber,
       cardHolderName,
@@ -51,88 +63,84 @@ async function createPaymentMethod(req, res) {
       paypalEmail,
       bankName,
       accountNumber,
-      isDefault = false
+      isDefault = false,
     } = req.body;
 
-    // Validaciones básicas
-    if (!user || !type) {
-      return res.status(400).json({ error: 'User and type are required' });
+    const allowedTypes = ["credit_card", "debit_card", "paypal", "bank_transfer"];
+    if (!allowedTypes.includes(type)) {
+      return res.status(400).json({ error: "Invalid payment method type" });
     }
 
-    const validTypes = ['credit_card', 'debit_card', 'paypal', 'bank_transfer', 'cash_on_delivery'];
-    if (!validTypes.includes(type)) {
-      return res.status(400).json({ error: 'Invalid payment method type' });
-    }
-
-    // Validaciones específicas por tipo
-    if (type === 'credit_card' || type === 'debit_card') {
+    if (type === "credit_card" || type === "debit_card") {
       if (!cardNumber || !cardHolderName || !expiryDate) {
         return res.status(400).json({
-          error: 'Card number, card holder name, and expiry date are required for card payments'
+          error: "Card number, card holder name, and expiry date are required for card payments",
         });
       }
-      // Validación básica del número de tarjeta (16 dígitos)
-      if (!/^\d{16}$/.test(cardNumber.replace(/\s/g, ''))) {
-        return res.status(400).json({ error: 'Card number must be 16 digits' });
-      }
-      // Validación del formato de fecha de expiración (MM/YY)
       if (!/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiryDate)) {
-        return res.status(400).json({ error: 'Expiry date must be in MM/YY format' });
+        return res.status(400).json({ error: "Expiry date must be in MM/YY format" });
       }
-    } else if (type === 'paypal') {
+    } else if (type === "paypal") {
       if (!paypalEmail) {
-        return res.status(400).json({ error: 'PayPal email is required for PayPal payments' });
+        return res.status(400).json({ error: "PayPal email is required for PayPal payments" });
       }
-      // Validación básica de email
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(paypalEmail)) {
-        return res.status(400).json({ error: 'Invalid PayPal email format' });
-      }
-    } else if (type === 'bank_transfer') {
+    } else if (type === "bank_transfer") {
       if (!bankName || !accountNumber) {
-        return res.status(400).json({ error: 'Bank name and account number are required for bank transfers' });
+        return res.status(400).json({
+          error: "Bank name and account number are required for bank transfers",
+        });
       }
     }
+
+    const userId = req.user.userId;
 
     // Si se marca como default, desmarcar otros métodos default del usuario
     if (isDefault) {
-      await PaymentMethod.updateMany(
-        { user: user, isDefault: true },
-        { isDefault: false }
-      );
+      await PaymentMethod.updateMany({ user: userId, isDefault: true }, { isDefault: false });
     }
 
     const newPaymentMethod = await PaymentMethod.create({
-      user,
+      user: userId,
       type,
-      cardNumber: type === 'credit_card' || type === 'debit_card' ? cardNumber : undefined,
-      cardHolderName: type === 'credit_card' || type === 'debit_card' ? cardHolderName : undefined,
-      expiryDate: type === 'credit_card' || type === 'debit_card' ? expiryDate : undefined,
-      paypalEmail: type === 'paypal' ? paypalEmail : undefined,
-      bankName: type === 'bank_transfer' ? bankName : undefined,
-      accountNumber: type === 'bank_transfer' ? accountNumber : undefined,
-      isDefault,
-      isActive: true
+      cardNumber: type === "credit_card" || type === "debit_card" ? cardNumber : undefined,
+      cardHolderName: type === "credit_card" || type === "debit_card" ? cardHolderName : undefined,
+      expiryDate: type === "credit_card" || type === "debit_card" ? expiryDate : undefined,
+      paypalEmail: type === "paypal" ? paypalEmail : undefined,
+      bankName: type === "bank_transfer" ? bankName : undefined,
+      accountNumber: type === "bank_transfer" ? accountNumber : undefined,
+      isDefault: Boolean(isDefault),
+      isActive: true,
     });
 
-    await newPaymentMethod.populate('user');
+    await newPaymentMethod.populate("user");
     res.status(201).json(newPaymentMethod);
   } catch (error) {
     next(error);
   }
 }
 
-async function updatePaymentMethod(req, res) {
+async function updatePaymentMethod(req, res, next) {
   try {
     const { id } = req.params;
     const updateData = req.body;
 
     const paymentMethod = await PaymentMethod.findById(id);
     if (!paymentMethod) {
-      return res.status(404).json({ message: 'Payment method not found' });
+      return res.status(404).json({ message: "Payment method not found" });
     }
 
+    assertCanManagePaymentMethod(paymentMethod, req.user);
+
     // Campos permitidos para actualizar
-    const allowedFields = ['cardHolderName', 'expiryDate', 'paypalEmail', 'bankName', 'accountNumber', 'isDefault', 'isActive'];
+    const allowedFields = [
+      "cardHolderName",
+      "expiryDate",
+      "paypalEmail",
+      "bankName",
+      "accountNumber",
+      "isDefault",
+      "isActive",
+    ];
     const filteredUpdate = {};
 
     for (const field of allowedFields) {
@@ -141,14 +149,27 @@ async function updatePaymentMethod(req, res) {
       }
     }
 
+    // Validar que al menos un campo sea proporcionado
+    if (Object.keys(filteredUpdate).length === 0) {
+      return res.status(400).json({
+        message: "At least one field must be provided for update",
+      });
+    }
+
     // Validaciones específicas según el tipo
-    if (paymentMethod.type === 'credit_card' || paymentMethod.type === 'debit_card') {
-      if (filteredUpdate.expiryDate && !/^(0[1-9]|1[0-2])\/\d{2}$/.test(filteredUpdate.expiryDate)) {
-        return res.status(400).json({ error: 'Expiry date must be in MM/YY format' });
+    if (paymentMethod.type === "credit_card" || paymentMethod.type === "debit_card") {
+      if (
+        filteredUpdate.expiryDate &&
+        !/^(0[1-9]|1[0-2])\/\d{2}$/.test(filteredUpdate.expiryDate)
+      ) {
+        return res.status(400).json({ error: "Expiry date must be in MM/YY format" });
       }
-    } else if (paymentMethod.type === 'paypal') {
-      if (filteredUpdate.paypalEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(filteredUpdate.paypalEmail)) {
-        return res.status(400).json({ error: 'Invalid PayPal email format' });
+    } else if (paymentMethod.type === "paypal") {
+      if (
+        filteredUpdate.paypalEmail &&
+        !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(filteredUpdate.paypalEmail)
+      ) {
+        return res.status(400).json({ error: "Invalid PayPal email format" });
       }
     }
 
@@ -160,11 +181,9 @@ async function updatePaymentMethod(req, res) {
       );
     }
 
-    const updatedPaymentMethod = await PaymentMethod.findByIdAndUpdate(
-      id,
-      filteredUpdate,
-      { new: true }
-    ).populate('user');
+    const updatedPaymentMethod = await PaymentMethod.findByIdAndUpdate(id, filteredUpdate, {
+      new: true,
+    }).populate("user");
 
     res.status(200).json(updatedPaymentMethod);
   } catch (error) {
@@ -172,17 +191,19 @@ async function updatePaymentMethod(req, res) {
   }
 }
 
-async function setDefaultPaymentMethod(req, res) {
+async function setDefaultPaymentMethod(req, res, next) {
   try {
     const { id } = req.params;
 
     const paymentMethod = await PaymentMethod.findById(id);
     if (!paymentMethod) {
-      return res.status(404).json({ message: 'Payment method not found' });
+      return res.status(404).json({ message: "Payment method not found" });
     }
 
+    assertCanManagePaymentMethod(paymentMethod, req.user);
+
     if (!paymentMethod.isActive) {
-      return res.status(400).json({ message: 'Cannot set inactive payment method as default' });
+      return res.status(400).json({ message: "Cannot set inactive payment method as default" });
     }
 
     // Desmarcar otros métodos default del usuario
@@ -196,7 +217,7 @@ async function setDefaultPaymentMethod(req, res) {
       id,
       { isDefault: true },
       { new: true }
-    ).populate('user');
+    ).populate("user");
 
     res.status(200).json(updatedPaymentMethod);
   } catch (error) {
@@ -204,20 +225,22 @@ async function setDefaultPaymentMethod(req, res) {
   }
 }
 
-async function deactivatePaymentMethod(req, res) {
+async function deactivatePaymentMethod(req, res, next) {
   try {
     const { id } = req.params;
 
     const paymentMethod = await PaymentMethod.findById(id);
     if (!paymentMethod) {
-      return res.status(404).json({ message: 'Payment method not found' });
+      return res.status(404).json({ message: "Payment method not found" });
     }
+
+    assertCanManagePaymentMethod(paymentMethod, req.user);
 
     const updatedPaymentMethod = await PaymentMethod.findByIdAndUpdate(
       id,
       { isActive: false, isDefault: false },
       { new: true }
-    ).populate('user');
+    ).populate("user");
 
     res.status(200).json(updatedPaymentMethod);
   } catch (error) {
@@ -225,48 +248,49 @@ async function deactivatePaymentMethod(req, res) {
   }
 }
 
-async function deletePaymentMethod(req, res) {
+async function deletePaymentMethod(req, res, next) {
   try {
     const { id } = req.params;
 
-    const deletedPaymentMethod = await PaymentMethod.findByIdAndDelete(id);
-    if (!deletedPaymentMethod) {
-      return res.status(404).json({ message: 'Payment method not found' });
+    const paymentMethod = await PaymentMethod.findById(id);
+    if (!paymentMethod) {
+      return res.status(404).json({ message: "Payment method not found" });
     }
+
+    assertCanManagePaymentMethod(paymentMethod, req.user);
+
+    await paymentMethod.deleteOne();
 
     res.status(204).send();
   } catch (error) {
-    res.status(500).json({ error });
+    next(error);
   }
 }
 
-async function getDefaultPaymentMethod(req, res) {
+async function getDefaultPaymentMethod(req, res, next) {
   try {
-    const userId = req.params.userId;
+    const userId = req.user.userId;
     const defaultPaymentMethod = await PaymentMethod.findOne({
       user: userId,
       isDefault: true,
-      isActive: true
-    }).populate('user');
+      isActive: true,
+    }).populate("user");
 
-    if (!defaultPaymentMethod) {
-      return res.status(404).json({ message: 'No default payment method found for this user' });
-    }
-
-    res.json(defaultPaymentMethod);
+    res.json(defaultPaymentMethod || null);
   } catch (error) {
     next(error);
   }
 }
 
 export {
-  getPaymentMethods,
-  getPaymentMethodById,
-  getPaymentMethodsByUser,
-  createPaymentMethod,
-  updatePaymentMethod,
-  setDefaultPaymentMethod,
-  deactivatePaymentMethod,
-  deletePaymentMethod,
-  getDefaultPaymentMethod,
+    createPaymentMethod,
+    deactivatePaymentMethod,
+    deletePaymentMethod,
+    getDefaultPaymentMethod,
+    getPaymentMethodById,
+    getPaymentMethods,
+    getPaymentMethodsByUser,
+    setDefaultPaymentMethod,
+    updatePaymentMethod
 };
+

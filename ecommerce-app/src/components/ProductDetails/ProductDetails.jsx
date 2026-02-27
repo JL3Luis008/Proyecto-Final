@@ -3,12 +3,13 @@ import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import categoriesData from "../../data/categories.json";
 import Breadcrumb from "../../layout/Breadcrumb/Breadcrumb";
-import { getProductById } from "../../services/productService";
+ import { getProductById } from "../../services/productService";
 import Badge from "../common/Badge";
 import Button from "../common/Button";
 import ErrorMessage from "../common/ErrorMessage/ErrorMessage";
 import Loading from "../common/Loading/Loading";
 import "./ProductDetails.css";
+
 
 export default function ProductDetails({ productId }) {
   const { addToCart } = useCart();
@@ -17,18 +18,20 @@ export default function ProductDetails({ productId }) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
-    getProductById(productId)
-      .then((foundProduct) => {
-        if (!foundProduct) {
-          setError("Producto no encontrado");
-        } else {
-          setProduct(foundProduct);
-        }
-      })
-      .catch(() => setError("Ocurrió un error al cargar el producto."))
-      .finally(() => setLoading(false));
+    const loadProduct = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const productData = await getProductById(productId);
+        setProduct(productData);
+      } catch (error) {
+        setError("Error al cargar el producto");
+      }
+      finally{
+        setLoading(false);
+      }
+    };
+    loadProduct();
   }, [productId]);
 
   const resolvedCategory = useMemo(() => {

@@ -1,78 +1,100 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Icon from "../components/common/Icon/Icon";
+import { useCart } from "../context/CartContext";
 import "./OrderConfirmation.css";
 
 export default function OrderConfirmation() {
   const location = useLocation();
   const navigate = useNavigate();
   const { order } = location.state || {};
+  const { clearCart } = useCart();
+  const clearedRef = useRef(false);
 
   useEffect(() => {
+    // Si no hay orden en el state, redirigir al inicio
     if (!order) {
       navigate("/");
       return;
     }
+
+    // Limpiar el carrito una sola vez cuando llegamos a la confirmación
+    if (!clearedRef.current) {
+      try {
+        clearCart();
+      } catch (e) {
+        // si hay algún problema, no bloqueamos la vista de confirmación
+        // (ej. clearCart no está disponible)
+      }
+      clearedRef.current = true;
+    }
   }, [order, navigate]);
 
-  const address = order.shippingAddress || {};
-  const subtotal = order.subtotal || 0;
-  const tax = order.tax || 0;
-  const shipping = order.shipping || 0;
-  const total = order.total || 0;
+  if (!order) return null;
+
+  // Formatear la fecha para mostrarla
   const orderDate = order.date
     ? new Date(order.date).toLocaleDateString()
     : "No disponible";
 
-  // Utilidad para formatear moneda (MXN)
-  const formatMoney = (v) =>
-    new Intl.NumberFormat("es-MX", {
-      style: "currency",
-      currency: "MXN",
-    }).format(v);
+  // Formatear el total con Intl.NumberFormat para mejor formato de moneda
+  const money = (v) =>
+    typeof v === "number"
+      ? new Intl.NumberFormat("es-MX", {
+          style: "currency",
+          currency: "MXN",
+          minimumFractionDigits: 2,
+        }).format(v)
+      : "$0.00";
+
+  const address = order.shippingAddress || {};
+  const subtotal = order.subtotal ?? 0;
+  const tax = order.tax ?? 0;
+  const shipping = order.shipping ?? 0;
+  const total = order.total ?? subtotal + tax + shipping;
 
   return (
     <div className="order-confirmation">
       <div className="confirmation-content">
         <div className="confirmation-icon">
-          <Icon name="checkCircle" size={64} className="success"></Icon>
+          <Icon name="checkCircle" size={64} className="success" />
         </div>
         <h1>¡Gracias por tu compra!</h1>
         <p className="confirmation-message">
-          Tu pedido <strong>#{order.id || "N/A"}</strong> ha sido confirmado y
-          está siendo procesado
+          Tu pedido #{order.id || "N/A"} ha sido confirmado y está siendo
+          procesado.
         </p>
         <div className="confirmation-details">
-          <h2>Detalles de tu pedido</h2>
+          <h2>Detalles de tu pedido:</h2>
           <div className="order-info">
             <p>
-              <strong>Fecha: </strong>
-              {orderDate}
+              <strong>Fecha:</strong> {orderDate}
             </p>
+
             <h3>Productos</h3>
             <ul className="order-items">
-              {(order.items || []).map((item) => (
-                <li key={item._id}>
-                  {item.name} x {item.quantity} - {formatMoney(item.price)}
-                  <span>{formatMoney(item.subtotal)}</span>
+              {(order.items || []).map((it) => (
+                <li key={it._id || it.id || it.name}>
+                  {it.name} x{it.quantity} — {money(it.price)}
+                  <span style={{ float: "right" }}>{money(it.subtotal)}</span>
                 </li>
               ))}
             </ul>
+
             <div className="order-totals">
               <p>
-                <strong>Subtotal: </strong>
-                {formatMoney(subtotal)}
+                <strong>Subtotal:</strong> {money(subtotal)}
               </p>
               <p>
-                <strong>IVA: </strong>
-                {formatMoney(tax)}
+                <strong>IVA:</strong> {money(tax)}
               </p>
               <p>
-                <strong>Envío: </strong>
-                {formatMoney(shipping)}
+                <strong>Envío:</strong>{" "}
+                {shipping === 0 ? "Gratis" : money(shipping)}
               </p>
+              <hr />
               <p>
-                <strong>Total:</strong> {formatMoney(total)}
+                <strong>Total:</strong> {money(total)}
               </p>
 
               <p>

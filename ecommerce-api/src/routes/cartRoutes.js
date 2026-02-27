@@ -1,37 +1,131 @@
-import express from 'express';
+import express from "express";
+import { body, param } from "express-validator";
 import {
-  getCarts,
+  addProductToCart,
+  createCart,
+  deleteCart,
   getCartById,
   getCartByUser,
-  createCart,
+  getCarts,
   updateCart,
-  deleteCart,
-  addProductToCart,
-} from '../controllers/cartController.js';
-import authMiddleware from '../middlewares/authMiddleware.js';
-import isAdministrator from '../middlewares/isAdministratorMiddleware.js';
+  updateCartItem,
+  removeCartItem,
+  clearCartItems,
+} from "../controllers/cartController.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
+import isAdmin from "../middlewares/isAdminMiddleware.js";
+import validate from "../middlewares/validation.js";
+import {
+  mongoIdValidation,
+  bodyMongoIdValidation,
+  quantityValidation,
+} from "../middlewares/validators.js";
 
 const router = express.Router();
 
-// Obtener todos los carritos (admin)
-router.get('/cart', authMiddleware, isAdministrator, getCarts);
+router.get("/cart", authMiddleware, isAdmin, getCarts);
 
-// Obtener carrito por ID
-router.get('/cart/:id', authMiddleware, isAdministrator, getCartById);
+router.get(
+  "/cart/user/:id",
+  authMiddleware,
+  [mongoIdValidation("id", "User ID")],
+  validate,
+  getCartByUser,
+);
 
-// Obtener carrito por usuario
-router.get('/cart/user/:id', authMiddleware, getCartByUser);
+router.post(
+  "/cart/add-product",
+  authMiddleware,
+  [
+    bodyMongoIdValidation("userId", "User ID"),
+    bodyMongoIdValidation("productId", "Product ID"),
+    quantityValidation("quantity", true),
+  ],
+  validate,
+  addProductToCart,
+);
 
-// Crear nuevo carrito
-router.post('/cart', authMiddleware, createCart);
+router.get(
+  "/cart/:id",
+  authMiddleware,
+  isAdmin,
+  [mongoIdValidation("id", "Cart ID")],
+  validate,
+  getCartById,
+);
 
-// Agregar producto al carrito (función especial)
-router.post('/cart/add-product', authMiddleware, addProductToCart);
+router.post(
+  "/cart",
+  authMiddleware,
+  [
+    bodyMongoIdValidation("user", "User"),
+    body("products")
+      .notEmpty()
+      .withMessage("Products are required")
+      .isArray({ min: 1 })
+      .withMessage("Products must be a non-empty array"),
+    bodyMongoIdValidation("products.*.product", "Product ID"),
+    quantityValidation("products.*.quantity"),
+  ],
+  validate,
+  createCart,
+);
 
-// Actualizar carrito completo
-router.put('/cart/:id', authMiddleware, updateCart);
+router.put(
+  "/cart-item/:id",
+  authMiddleware,
+  [
+    mongoIdValidation("id", "Cart ID"),
+    bodyMongoIdValidation("user", "User ID", true),
+    body("products")
+      .optional()
+      .isArray({ min: 1 })
+      .withMessage("Products must be a non-empty array"),
+    bodyMongoIdValidation("products.*.product", "Product ID", true),
+    quantityValidation("products.*.quantity", true),
+  ],
+  validate,
+  updateCart,
+);
 
-// Eliminar carrito
-router.delete('/cart/:id', authMiddleware, deleteCart);
+router.delete(
+  "/cart/:id",
+  authMiddleware,
+  [mongoIdValidation("id", "Cart ID")],
+  validate,
+  deleteCart,
+);
+
+// Rutas nuevas
+router.put(
+  "/cart/update-item",
+  authMiddleware,
+  [
+    bodyMongoIdValidation("userId", "User ID"),
+    bodyMongoIdValidation("productId", "Product ID"),
+    quantityValidation("quantity", true),
+  ],
+  validate,
+  updateCartItem,
+);
+
+router.delete(
+  "/cart/remove-item/:productId",
+  authMiddleware,
+  [
+    mongoIdValidation("productId", "Product ID"),
+    bodyMongoIdValidation("userId", "User ID"),
+  ],
+  validate,
+  removeCartItem,
+);
+
+router.post(
+  "/cart/clear",
+  authMiddleware,
+  [bodyMongoIdValidation("userId", "User ID")],
+  validate,
+  clearCartItems,
+);
 
 export default router;

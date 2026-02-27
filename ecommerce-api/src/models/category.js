@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const categorySchema = new mongoose.Schema({
   name: {
@@ -14,15 +14,15 @@ const categorySchema = new mongoose.Schema({
   imageURL: {
     type: String,
     trim: true,
-    default: 'https://placehold.co/800x600.png',
+    default: "https://placehold.co/800x600.png",
   },
   parentCategory: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Category',
+    ref: "Category",
     default: null,
-  }
+  },
 });
 
-const Category = mongoose.model('Category', categorySchema);
+const Category = mongoose.model("Category", categorySchema);
 
 export default Category;

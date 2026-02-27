@@ -1,15 +1,13 @@
-import mongoose from 'mongoose';
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
+import mongoose from "mongoose";
 
 dotenv.config();
-//require('dotenv').config({ override: true });
- 
+
 const dbConnection = async () => {
   try {
     const dbURI = process.env.MONGODB_URI;
-    const dbName = process.env.MONGODB_DB;
 
-    await mongoose.connect(`${dbURI}/${dbName}`, {
+    await mongoose.connect(dbURI, {
       // If you use MongoDB < 8 you have to use this:
       //useNewUrlParser:true,
       //useUnifiedTopology:true

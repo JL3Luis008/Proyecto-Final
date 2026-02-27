@@ -26,7 +26,7 @@
   {
     "title": "Envío Gratis",
     "subtitle": "En compras superiores a $1000",
-    "image": ["/img/products/banner4.png"],
+    "image": ["/img/products/banner4.jpg"],
     "buttonText": "Comprar Ahora",
     "buttonLink": "/free-shipping",
     "backgroundColor": "#79bf87"

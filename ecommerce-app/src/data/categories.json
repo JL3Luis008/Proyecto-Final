@@ -127,6 +127,70 @@
      "parentCategory": null
     }
   }
+  ,
+ {
+    "_id": "68c396f6a24a7edc4231c9e3",
+    "name": "Sega",
+    "description": "Sega company",
+    "imageURL": ["/img/products/PlaystationLogo.png"],
+    "parentCategory": null
+  }
+  ,
+  {
+    "_id": "63c396f6a24a7edc4233c9e5",
+    "name": "Consolas",
+    "description": "Consolas de videojuegos",
+    "imageURL": "https://placehold.co/800x600.png",
+    "parentCategory": {
+      "_id": "68c396f6a24a7edc4231c9e3",
+     "name": "Sega",
+     "description": "Sega company",
+     "imageURL": ["/img/products/SegaLogo.jpg"],
+     "parentCategory": null
+    }
+  }
+   ,
+  {
+    "_id": "68c396f6a2qa7edc4243c9e5",
+    "name": "VideoJuegos",
+    "description": "videojuegos de Nintendo",
+    "imageURL": "https://placehold.co/800x600.png",
+    "parentCategory": {
+      "_id": "68c396f6a24a7edc4231c9e3",
+     "name": "Sega",
+     "description": "Sega company",
+     "imageURL": ["/img/products/SegaLogo.jpg"],
+     "parentCategory": null
+    }
+  }
+  ,
+    {
+    "_id": "68c396f6a24w7edc4143c9e5",
+    "name": "Coleccionables",
+    "description": "Coleccionables de Nintendo",
+    "imageURL": "https://placehold.co/800x600.png",
+    "parentCategory": {
+      "_id": "68c396f6a24a7edc4231c9e3",
+     "name": "Sega",
+     "description": "Sega company",
+     "imageURL": ["/img/products/SegaLogo.jpg"],
+     "parentCategory": null
+    }
+  }
+   ,
+    {
+    "_id": "68c396f6a44a7edc4143c9e5",
+    "name": "Gadgets",
+    "description": "Accesorios de Nintendo",
+    "imageURL": "https://placehold.co/800x600.png",
+    "parentCategory": {
+      "_id": "68c396f6a24a7edc4231c9e3",
+     "name": "Sega",
+     "description": "Sega company",
+     "imageURL": ["/img/products/SegaLogo.jpg"],
+     "parentCategory": null
+    }
+  }
 
   
 ]

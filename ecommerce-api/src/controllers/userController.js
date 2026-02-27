@@ -21,7 +21,7 @@ const getUserProfile = async (req, res, next) => {
   }
 };
 
-// Obtener todos los usuarios (solo Administrator)
+// Obtener todos los usuarios (solo admin)
 const getAllUsers = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, role, isActive } = req.query;
@@ -31,10 +31,13 @@ const getAllUsers = async (req, res, next) => {
     if (role) filter.role = role;
     if (isActive !== undefined) filter.isActive = isActive === "true";
 
+    const pageNum = parseInt(page, 10) || 1;
+    const limitNum = parseInt(limit, 10) || 10;
+
     const users = await User.find(filter)
       .select("-hashPassword")
-      .limit(limit * 1)
-      .skip((page - 1) * limit)
+      .limit(limitNum)
+      .skip((pageNum - 1) * limitNum)
       .sort({ _id: -1 });
 
     const total = await User.countDocuments(filter);
@@ -42,16 +45,19 @@ const getAllUsers = async (req, res, next) => {
     res.status(200).json({
       message: "Users retrieved successfully",
       users,
-      totalPages: Math.ceil(total / limit),
-      currentPage: page,
-      total,
+      pagination: {
+        total,
+        totalPages: Math.ceil(total / limitNum) || 1,
+        currentPage: pageNum,
+        perPage: limitNum,
+      },
     });
   } catch (error) {
     next(error);
   }
 };
 
-// Obtener usuario por ID (solo Administrator)
+// Obtener usuario por ID (solo admin)
 const getUserById = async (req, res, next) => {
   try {
     const { userId } = req.params;
@@ -77,6 +83,13 @@ const updateUserProfile = async (req, res, next) => {
     const userId = req.user.userId;
     const { displayName, email, phone, avatar } = req.body;
 
+    // Validar que al menos un campo esté presente
+    if (!displayName && !email && !phone && avatar === undefined) {
+      return res.status(400).json({
+        message: "At least one field must be provided to update",
+      });
+    }
+
     // Verificar si el email ya existe (si se está cambiando)
     const user = await User.findById(userId);
     if (!user) {
@@ -90,11 +103,11 @@ const updateUserProfile = async (req, res, next) => {
       }
     }
 
-    // Actualizar campos
+    // Actualizar campos solo si están presentes
     if (displayName) user.displayName = displayName;
     if (email) user.email = email;
     if (phone) user.phone = phone;
-    if (avatar) user.avatar = avatar;
+    if (avatar !== undefined) user.avatar = avatar;
 
     await user.save();
 
@@ -142,11 +155,25 @@ const changePassword = async (req, res, next) => {
   }
 };
 
-// Actualizar usuario (solo Administrator)
+// Actualizar usuario (solo admin)
 const updateUser = async (req, res, next) => {
   try {
     const { userId } = req.params;
     const { displayName, email, phone, avatar, role, isActive } = req.body;
+
+    // Validar que al menos un campo esté presente
+    if (
+      !displayName &&
+      !email &&
+      !phone &&
+      avatar === undefined &&
+      !role &&
+      isActive === undefined
+    ) {
+      return res.status(400).json({
+        message: "At least one field must be provided to update",
+      });
+    }
 
     const user = await User.findById(userId);
     if (!user) {
@@ -161,11 +188,11 @@ const updateUser = async (req, res, next) => {
       }
     }
 
-    // Actualizar campos
+    // Actualizar campos solo si están presentes
     if (displayName) user.displayName = displayName;
     if (email) user.email = email;
     if (phone) user.phone = phone;
-    if (avatar) user.avatar = avatar;
+    if (avatar !== undefined) user.avatar = avatar;
     if (role) user.role = role;
     if (isActive !== undefined) user.isActive = isActive;
 
@@ -203,7 +230,7 @@ const deactivateUser = async (req, res, next) => {
   }
 };
 
-// Activar/Desactivar usuario (solo Administrator)
+// Activar/Desactivar usuario (solo admin)
 const toggleUserStatus = async (req, res, next) => {
   try {
     const { userId } = req.params;
@@ -219,9 +246,7 @@ const toggleUserStatus = async (req, res, next) => {
     const updatedUser = await User.findById(userId).select("-hashPassword");
 
     res.status(200).json({
-      message: `User ${
-        user.isActive ? "activated" : "deactivated"
-      } successfully`,
+      message: `User ${user.isActive ? "activated" : "deactivated"} successfully`,
       user: updatedUser,
     });
   } catch (error) {
@@ -251,20 +276,35 @@ const deleteUser = async (req, res, next) => {
   }
 };
 
-const searchUsers = async (req, res, next) => {
+const searchUser = async (req, res, next) => {
   try {
-    const { q, role, isActive, sort, order, page = 1, limit = 10 } = req.query;
-
+    const {
+      q,
+      displayName,
+      email,
+      phone,
+      role,
+      isActive,
+      sort,
+      order,
+      page = 1,
+      limit = 10,
+    } = req.query;
+    //http://localhost:3000/api/users/search?q=santiago;
     let filters = {};
 
+    if (displayName) {
+      filters.displayName = { $regex: displayName, $options: "i" };
+    }
     if (q) {
       filters.$or = [
         { displayName: { $regex: q, $options: "i" } },
+        { phone: { $regex: q, $options: "i" } },
         { email: { $regex: q, $options: "i" } },
-        { phone: { $regex: q } },
       ];
     }
-    //http://localhost:3000/api/users/search?q=Espe
+
+    //http://localhost:3000/api/users/search?sort=email;
     if (role) {
       filters.role = role;
     }
@@ -275,6 +315,7 @@ const searchUsers = async (req, res, next) => {
     }
 
     let sortOptions = {};
+
     if (sort) {
       const sortOrder = order === "desc" ? -1 : 1;
       sortOptions[sort] = sortOrder;
@@ -282,31 +323,35 @@ const searchUsers = async (req, res, next) => {
       sortOptions.email = -1;
     }
 
-    const skip = (parseInt(page) - 1) * parseInt(limit);
+    const pageNum = parseInt(page, 10) || 1;
+    const limitNum = parseInt(limit, 10) || 10;
+    const skip = (pageNum - 1) * limitNum;
 
     const users = await User.find(filters)
       .sort(sortOptions)
       .skip(skip)
-      .limit(parseInt(limit));
+      .limit(limitNum)
+      .select("-hashPassword");
 
-    const totalResults = await User.countDocuments(filters);
-    const totalPages = Math.ceil(totalResults / parseInt(limit));
+    const total = await User.countDocuments(filters);
+    const totalPages = Math.ceil(total / limitNum) || 1;
 
     res.status(200).json({
+      message: "Users retrieved successfully",
       users,
       pagination: {
-        currentPage: parseInt(page),
+        currentPage: pageNum,
         totalPages,
-        totalResults,
-        hasNext: parseInt(page) < totalPages,
-        hasPrev: parseInt(page) > 1,
+        perPage: limitNum,
+        total,
+        hasNext: pageNum < totalPages,
+        hasPrev: pageNum > 1,
       },
       filters: {
         searchTerm: q || null,
         role: role || null,
-        isActive,
-        sort: sort || "email",
-        order: order || "desc",
+        isActive: isActive === "true" ? true : isActive === "false" ? false : null,
+        order: order || "email",
       },
     });
   } catch (error) {
@@ -314,15 +359,38 @@ const searchUsers = async (req, res, next) => {
   }
 };
 
+const createUser = async (req, res, next) => {
+  try {
+    const { displayName, email, phone, avatar, role, isActive, password } = req.body;
+    const saltRounds = 10;
+    const hashPassword = await bcrypt.hash(password, saltRounds);
+    const newUser = new User({
+      displayName,
+      email,
+      hashPassword,
+      role,
+      phone,
+      avatar,
+      isActive,
+    });
+    await newUser.save();
+    const created = await User.findById(newUser._id).select("-hashPassword");
+    res.status(201).json({ message: "User created successfully", user: created });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export {
-  getUserProfile,
+  changePassword,
+  createUser,
+  deactivateUser,
+  deleteUser,
   getAllUsers,
   getUserById,
-  updateUserProfile,
-  changePassword,
-  updateUser,
-  deactivateUser,
+  getUserProfile,
+  searchUser,
   toggleUserStatus,
-  deleteUser,
-  searchUsers
+  updateUser,
+  updateUserProfile,
 };

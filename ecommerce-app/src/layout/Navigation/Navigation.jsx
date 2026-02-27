@@ -55,12 +55,12 @@ const Navigation = ({ isMobile = false, onLinkClick }) => {
           Consolas
         </Link>
         <Link
-          to="/bestsellers"
+          to="/more"
           className="mobile-nav-link special"
           onClick={onLinkClick}
         >
           <Icon name="star" size={20} />
-          Más vendidos
+          Más...
         </Link>
 
 

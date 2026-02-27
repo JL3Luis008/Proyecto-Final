@@ -1,33 +1,56 @@
-import products from '../data/products.json';
+import { http } from "./http";
 
-export const fetchProducts = async () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(products);
-    }, 2000);
-  });
+//const BASE_URL = `${process.env.REACT_APP_API_BASE_URL}products`;
+
+// export const getProducts = async ()=>{
+//     // User.findOne({name}).then(user=>{
+//     //   Orders.find({userId:user.id}).then(orders=>{
+//     //   })
+//     // })
+
+//     // try {
+//     //   const user = await User.findOne({name});
+
+//     //   const orders = await Orders.find({userId: user.id})
+//     // } catch (error) {
+      
+//     // }
+
+//     try {
+
+
+//         const response = await fetch(BASE_URL);
+//         if (!response.ok) {
+//             console.log('error al hacer la petición');
+//             throw new Error('');
+//         }
+//         const data = await response.json();
+//         return data;
+//     } catch (error) {
+//         console.log(error);
+//         throw new Error(error);
+//     }
+//     finally{
+
+//     }
+// }
+
+export const getProducts = async (page, limit) => {
+  try {
+    const response = await http.get("products", { params: { page, limit } });
+    const data = response.data;
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
 };
 
-export const searchProducts = async (query) => {
-  const lowerQuery = query.trim().toLowerCase();
-  return fetchProducts().then((data) =>
-    data.filter(
-      (product) =>
-        product.name.toLowerCase().includes(lowerQuery) ||
-        product.description?.toLowerCase().includes(lowerQuery)
-    )
-  );
+export const getProductById = async (id) => {
+  try {
+    const response = await http.get(`products/${id}`);
+    const data = response.data;
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
 };
-
-export const getProductsByCategory = async (categoryId) => {
-  return fetchProducts().then((data) =>
-    data.filter((product) => product.category?._id === categoryId)
-  );
-};
-
-export async function getProductById(id) {
-  // Simulación de delay y búsqueda en mock data
-  await new Promise((res) => setTimeout(res, 300));
-  const products = await fetchProducts();
-  return products.find((p) => p._id === id);
-}

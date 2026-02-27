@@ -1,24 +1,19 @@
-import users from "../data/users.json";
+import { http } from "./http";
 
-export const fetchUsers = async () => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(users);
-    }, 1500); // 1.5 segundos de delay
-  });
+export const isAuthenticated = () => {
+  const token = localStorage.getItem("authToken");
+  return token !== null;
 };
 
-export const searchUsers = async (query) => {
-  const lowerQuery = query.trim().toLowerCase();
-  return fetchUsers().then((data) =>
-    data.filter(
-      (user) =>
-        user.name.toLowerCase().includes(lowerQuery) ||
-        user.email?.toLowerCase().includes(lowerQuery)
-    )
-  );
-};
+export const getUserProfile = async () => {
+  const res = await http.get("users/profile");
+  const { message, user } = res.data;
 
-export const getUserById = async (userId) => {
-  return fetchUsers().then((data) => data.find((user) => user._id === userId));
+  if (!user) {
+    throw new Error("No se pudo obtener el perfil");
+  }
+
+  localStorage.setItem("userData", JSON.stringify(user));
+  console.log(message);
+  return user;
 };

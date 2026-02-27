@@ -1,45 +1,111 @@
-import express from 'express';
+import express from "express";
 import {
-  getPaymentMethods,
-  getPaymentMethodById,
-  getPaymentMethodsByUser,
-  createPaymentMethod,
-  updatePaymentMethod,
-  setDefaultPaymentMethod,
-  deactivatePaymentMethod,
-  deletePaymentMethod,
-  getDefaultPaymentMethod,
-} from '../controllers/paymentMethodController.js';
-import isAdministrator from '../middlewares/isAdministratorMiddleware.js';
-import authMiddleware from '../middlewares/authMiddleware.js';
+    createPaymentMethod,
+    deactivatePaymentMethod,
+    deletePaymentMethod,
+    getDefaultPaymentMethod,
+    getPaymentMethodById,
+    getPaymentMethods,
+    getPaymentMethodsByUser,
+    setDefaultPaymentMethod,
+    updatePaymentMethod,
+} from "../controllers/paymentMethodController.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
+import isAdmin from "../middlewares/isAdminMiddleware.js";
+import validate from "../middlewares/validation.js";
+import {
+    accountNumberValidation,
+    bankNameValidation,
+    booleanValidation,
+    cardHolderNameValidation,
+    cardNumberValidation,
+    expiryDateValidation,
+    mongoIdValidation,
+    paymentTypeValidation,
+    paypalEmailValidation,
+} from "../middlewares/validators.js";
 
 const router = express.Router();
 
 // Obtener todos los métodos de pago activos (admin)
-router.get('/payment-methods', authMiddleware, isAdministrator, getPaymentMethods);
+router.get("/payment-methods", authMiddleware, isAdmin, getPaymentMethods);
 
-// Obtener método de pago predeterminado de un usuario
-router.get('/payment-methods/default/:userId', authMiddleware, getDefaultPaymentMethod);
+// Obtener método de pago predeterminado del usuario autenticado
+router.get("/payment-methods/default", authMiddleware, getDefaultPaymentMethod);
 
-// Obtener métodos de pago de un usuario
-router.get('/payment-methods/user/:userId', authMiddleware, getPaymentMethodsByUser);
+// Obtener métodos de pago del usuario autenticado
+router.get("/payment-methods/me", authMiddleware, getPaymentMethodsByUser);
 
 // Obtener método de pago por ID
-router.get('/payment-methods/:id', authMiddleware, getPaymentMethodById);
+router.get(
+  "/payment-methods/:id",
+  authMiddleware,
+  [mongoIdValidation("id", "Payment method ID")],
+  validate,
+  getPaymentMethodById
+);
 
 // Crear nuevo método de pago
-router.post('/payment-methods', authMiddleware, createPaymentMethod);
+router.post(
+  "/payment-methods",
+  authMiddleware,
+  [
+    paymentTypeValidation(),
+    cardNumberValidation(),
+    cardHolderNameValidation(),
+    expiryDateValidation(),
+    paypalEmailValidation(),
+    bankNameValidation(),
+    accountNumberValidation(),
+    booleanValidation("isDefault"),
+  ],
+  validate,
+  createPaymentMethod
+);
 
 // Establecer método de pago como predeterminado
-router.patch('/payment-methods/:id/set-default', authMiddleware, setDefaultPaymentMethod);
+router.patch(
+  "/payment-methods/:id/set-default",
+  authMiddleware,
+  [mongoIdValidation("id", "Payment method ID")],
+  validate,
+  setDefaultPaymentMethod
+);
 
 // Desactivar método de pago
-router.patch('/payment-methods/:id/deactivate', authMiddleware, deactivatePaymentMethod);
+router.patch(
+  "/payment-methods/:id/deactivate",
+  authMiddleware,
+  [mongoIdValidation("id", "Payment method ID")],
+  validate,
+  deactivatePaymentMethod
+);
 
 // Actualizar método de pago
-router.put('/payment-methods/:id', authMiddleware, updatePaymentMethod);
+router.put(
+  "/payment-methods/:id",
+  authMiddleware,
+  [
+    mongoIdValidation("id", "Payment method ID"),
+    cardHolderNameValidation(),
+    expiryDateValidation(),
+    paypalEmailValidation(),
+    bankNameValidation(),
+    accountNumberValidation(),
+    booleanValidation("isDefault"),
+    booleanValidation("isActive"),
+  ],
+  validate,
+  updatePaymentMethod
+);
 
 // Eliminar método de pago permanentemente
-router.delete('/payment-methods/:id', authMiddleware, deletePaymentMethod);
+router.delete(
+  "/payment-methods/:id",
+  authMiddleware,
+  [mongoIdValidation("id", "Payment method ID")],
+  validate,
+  deletePaymentMethod
+);
 
 export default router;

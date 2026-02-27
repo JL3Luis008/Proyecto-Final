@@ -3,7 +3,7 @@ import Button from "../common/Button";
 import Icon from "../common/Icon/Icon";
 
 export default function CartView() {
-  const { cartItems, removeFromCart, updateQuantity } = useCart();
+  const { cartItems = [], removeFromCart, updateQuantity } = useCart();
 
   return (
     <div className="cart-view">
@@ -13,51 +13,64 @@ export default function CartView() {
         </h2>
       </div>
 
-      {cartItems &&
-        cartItems.map((item) => (
-          <div className="cart-item" key={item._id}>
-            <div className="cart-item-image">
-              <img src={item.imagesUrl[0]} alt={item.name} loading="lazy" />
-            </div>
+      {cartItems.length === 0 && <p>Tu carrito está vacío</p>}
 
-            <div className="cart-item-info">
-              <h3>{item.name}</h3>
-              <p className="cart-item-price">{`$${item.price.toFixed(2)}`}</p>
-            </div>
+      {cartItems.map((item) => (
+        <div className="cart-item" key={item._id}>
+          <div className="cart-item-image">
+            <img
+              src={item.imagesUrl?.[0] || "/img/products/placeholder.svg"}
+              alt={item.name}
+              loading="lazy"
+            />
+          </div>
 
-            <div className="cart-item-quantity">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => updateQuantity(item._id, item.quantity - 1)}
-              >
-                <Icon name="minus" size={15}></Icon>
-              </Button>
-              <span>{item.quantity}</span>
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => updateQuantity(item._id, item.quantity + 1)}
-              >
-                <Icon name="plus" size={15}></Icon>
-              </Button>
-            </div>
+          <div className="cart-item-info">
+            <h3>{item.name}</h3>
+            <p className="cart-item-price">
+              {`$${Number(item.price).toFixed(2)}`}
+            </p>
+          </div>
 
-            <div className="cart-item-total">
-              ${(item.price * item.quantity).toFixed(2)}
-            </div>
+          <div className="cart-item-quantity">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() =>
+                updateQuantity(item._id, Math.max(1, item.quantity - 1))
+              }
+            >
+              <Icon name="minus" size={15} />
+            </Button>
+
+            <span>{item.quantity}</span>
 
             <Button
-              variant="ghost"
-              className="danger"
+              variant="secondary"
               size="sm"
-              onClick={() => removeFromCart(item._id)}
-              title="Eliminar artículo"
+              onClick={() =>
+                updateQuantity(item._id, item.quantity + 1)
+              }
             >
-              <Icon name="trash" size={16} />
+              <Icon name="plus" size={15} />
             </Button>
           </div>
-        ))}
+
+          <div className="cart-item-total">
+            ${(Number(item.price) * item.quantity).toFixed(2)}
+          </div>
+
+          <Button
+            variant="ghost"
+            className="danger"
+            size="sm"
+            onClick={() => removeFromCart(item._id)}
+            title="Eliminar artículo"
+          >
+            <Icon name="trash" size={16} />
+          </Button>
+        </div>
+      ))}
     </div>
   );
 }

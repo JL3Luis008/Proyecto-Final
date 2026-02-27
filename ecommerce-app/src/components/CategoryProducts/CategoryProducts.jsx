@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Breadcrumb from "../../layout/Breadcrumb/Breadcrumb";
-import {
-  getCategoryById,
-  getProductsByCategoryAndChildren,
-} from "../../services/categoryService";
+// import {
+//   getCategoryById,
+//   //getProductsByCategoryAndChildren,
+// } from "../../services/categoryService";
 import ProductCard from "../ProductCard/ProductCard";
 import ErrorMessage from "../common/ErrorMessage/ErrorMessage";
 import Loading from "../common/Loading/Loading";
@@ -23,9 +23,10 @@ export default function CategoryProducts({ categoryId }) {
     const loadCategoryAndProducts = async () => {
       try {
         // Cargar la categoría y sus productos
-        const [categoryData, productsData] = await Promise.all([
-          getCategoryById(categoryId),
-          getProductsByCategoryAndChildren(categoryId),
+        const [categoryData, productsData] =
+         await Promise.all([
+          // getCategoryById(categoryId),
+          //getProductsByCategoryAndChildren(categoryId),
         ]);
 
         if (!categoryData) {

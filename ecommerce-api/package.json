@@ -5,7 +5,28 @@
   "type": "module",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "seedProducts": "node ./src/seed/productsCategories.js",
+    "test:unit:wishlist": "vitest run ecommerce-api/src/controllers/__tests__/wishListController.test.js",
+    "test:unit:reviews": "vitest run ecommerce-api/src/controllers/__tests__/reviewController.test.js",
+    "test:unit:payments": "vitest run ecommerce-api/src/controllers/__tests__/paymentMethodController.test.js",
+    "test:unit:shipping": "vitest run ecommerce-api/src/controllers/__tests__/shippingAddressController.test.js",
+    "test:unit:category": "vitest run ecommerce-api/src/controllers/__tests__/categoryController.test.js",
+    "test:unit:cart": "vitest run ecommerce-api/src/controllers/__tests__/cartController.test.js",
+    "test:unit:order": "vitest run ecommerce-api/src/controllers/__tests__/orderController.test.js",
+    "test:integration:wishlist": "vitest run ecommerce-api/src/__tests__/wishlist.integration.test.js",
+    "test:integration:reviews": "vitest run ecommerce-api/src/__tests__/reviews.integration.test.js",
+    "test:integration:payments": "vitest run ecommerce-api/src/__tests__/payments.integration.test.js",
+    "test:integration:shippingaddresses": "vitest run ecommerce-api/src/__tests__/shippingAddresses.integration.test.js",
+    "test:integration:category": "vitest run ecommerce-api/src/__tests__/category.integration.test.js",
+    "test:integration:auth": "vitest run ecommerce-api/src/__tests__/auth.integration.test.js",
+    "test:integration:products": "vitest run ecommerce-api/src/__tests__/products.integration.test.js",
+    "test:parallel": "npm-run-all -p test:unit:* test:integration:*"
   },
   "keywords": [],
   "author": "",
@@ -13,12 +34,24 @@
   "description": "",
   "dependencies": {
     "bcrypt": "^6.0.0",
-    "bcryptjs": "^3.0.2",
-    "dotenv": "^17.2.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.0",
     "express": "^5.1.0",
+    "express-rate-limit": "^8.2.1",
     "express-validator": "^7.2.1",
     "jsonwebtoken": "^9.0.2",
-    "mongoose": "^8.17.1",
+    "mongoose": "^8.16.3",
     "nodemon": "^3.1.10"
+  },
+  "devDependencies": {
+    "@babel/preset-env": "^7.28.5",
+    "@eslint/js": "^9.39.1",
+    "@vitest/coverage-v8": "^4.0.8",
+    "@vitest/ui": "^4.0.8",
+    "eslint": "^9.39.1",
+    "mongodb-memory-server": "^11.0.1",
+    "supertest": "^7.2.2",
+    "vitest": "^4.0.8",
+    "npm-run-all": "^4.1.5"
   }
 }

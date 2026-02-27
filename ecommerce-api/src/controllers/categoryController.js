@@ -1,11 +1,8 @@
 import Category from "../models/category.js";
-import errorHandler from "../middlewares/errorHandler.js";
 
 async function getCategories(req, res, next) {
   try {
-    const categories = await Category.find()
-      .populate("parentCategory")
-      .sort({ name: 1 });
+    const categories = await Category.find().populate("parentCategory").sort({ name: 1 });
     res.status(200).json(categories);
   } catch (error) {
     next(error);
@@ -13,9 +10,7 @@ async function getCategories(req, res, next) {
 }
 async function getCategoryById(req, res, next) {
   try {
-    const category = await Category.findById(req.params.id).populate(
-      "parentCategory"
-    );
+    const category = await Category.findById(req.params.id).populate("parentCategory");
     if (!category) {
       return res.status(404).json({ message: "Category not found" });
     }
@@ -44,11 +39,26 @@ async function updateCategory(req, res, next) {
     const { name, description, parentCategory, imageURL } = req.body;
     const idCategory = req.params.id;
 
-    const updatedCategory = await Category.findByIdAndUpdate(
-      idCategory,
-      { name, description, parentCategory, imageURL },
-      { new: true }
-    );
+    // Validar que al menos un campo sea proporcionado
+    if (
+      name === undefined &&
+      description === undefined &&
+      parentCategory === undefined &&
+      imageURL === undefined
+    ) {
+      return res.status(400).json({
+        message: "At least one field must be provided for update",
+      });
+    }
+
+    // Construir objeto de actualización con campos proporcionados
+    const updateData = {};
+    if (name !== undefined) updateData.name = name;
+    if (description !== undefined) updateData.description = description;
+    if (parentCategory !== undefined) updateData.parentCategory = parentCategory;
+    if (imageURL !== undefined) updateData.imageURL = imageURL;
+
+    const updatedCategory = await Category.findByIdAndUpdate(idCategory, updateData, { new: true });
 
     if (!updatedCategory) {
       return res.status(404).json({ message: "Category not found" });
@@ -71,9 +81,10 @@ async function deleteCategory(req, res, next) {
   }
 }
 
-async function searchCategories(req, res, next) {
+async function searchCategory(req, res, next) {
   try {
-    const { q, parentCategory, sort, order, limit = 10, page = 1 } = req.query;
+    const { q, parentCategory, sort, order, page = 1, limit = 10 } = req.query;
+
     let filters = {};
 
     if (q) {
@@ -85,7 +96,6 @@ async function searchCategories(req, res, next) {
     if (parentCategory) {
       filters.parentCategory = parentCategory;
     }
-
     let sortOptions = {};
     if (sort) {
       const sortOrder = order === "desc" ? -1 : 1;
@@ -93,8 +103,8 @@ async function searchCategories(req, res, next) {
     } else {
       sortOptions.name = -1;
     }
-    const skip = (parseInt(page) - 1) * parseInt(limit);
 
+    const skip = (parseInt(page) - 1) * parseInt(limit);
     const categories = await Category.find(filters)
       .populate("parentCategory")
       .sort(sortOptions)
@@ -111,14 +121,12 @@ async function searchCategories(req, res, next) {
         totalPages,
         totalResults,
         hasNext: parseInt(page) < totalPages,
-        hasPrev: parseInt(page) > 1,
+        nasPrev: parseInt(page) > 1,
       },
-      filters: {
-        searchTerm: q || null,
-        parentCategory: parentCategory || null,
-        sort: sort || "name",
-        order: order || "desc",
-      },
+      searchTerm: q || null,
+      parentCategory: parentCategory || null,
+      sort: sort || "name",
+      order: order || "desc",
     });
   } catch (error) {
     next(error);
@@ -126,10 +134,10 @@ async function searchCategories(req, res, next) {
 }
 
 export {
+  createCategory,
+  deleteCategory,
   getCategories,
   getCategoryById,
-  createCategory,
+  searchCategory,
   updateCategory,
-  deleteCategory,
-  searchCategories
 };

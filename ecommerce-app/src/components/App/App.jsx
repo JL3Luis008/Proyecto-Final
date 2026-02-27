@@ -6,7 +6,6 @@ import CategoryPage from "../../pages/CategoryPage";
 import Checkout from "../../pages/Checkout";
 import Home from "../../pages/Home";
 import Login from "../../pages/Login";
-import CreateAccount from "../../pages/CreateAccount";
 import OrderConfirmation from "../../pages/OrderConfirmation";
 import Orders from "../../pages/Orders";
 import Product from "../../pages/Product";
@@ -15,6 +14,8 @@ import ProtectedRoute from "../../pages/ProtectedRoute";
 import SearchResults from "../../pages/SearchResults";
 import Settings from "../../pages/Setttings";
 import WishList from "../../pages/WishList";
+import GuestOnly from "../../pages/GuestOnly";
+import Register from "../../pages/Register";
 
 function App() {
   return (
@@ -24,8 +25,15 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/cart" element={<Cart />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/account" element={<CreateAccount />} />
+            <Route path="/register" element={<Register />} />
+            <Route
+              path="/login"
+              element={
+                <GuestOnly>
+                  <Login />
+                </GuestOnly>
+              }
+            />
             <Route path="/search" element={<SearchResults />} />
             <Route path="/product/:productId" element={<Product />} />
             <Route path="/category/:categoryId" element={<CategoryPage />} />
@@ -34,7 +42,7 @@ function App() {
               element={
                 <ProtectedRoute
                   redirectTo="/login"
-                  allowedRoles={["admin", "customer", "cliente"]}
+                  allowedRoles={["admin", "customer", "guest"]}
                 >
                   <Profile />
                 </ProtectedRoute>
@@ -65,14 +73,6 @@ function App() {
               }
             />
             <Route path="/order-confirmation" element={<OrderConfirmation />} />
-            <Route
-              path="/settings"
-              element={
-                <ProtectedRoute>
-                  <Settings></Settings>
-                </ProtectedRoute>
-              }
-            />
             <Route
               path="/settings"
               element={
