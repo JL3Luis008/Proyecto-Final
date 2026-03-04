@@ -45,6 +45,8 @@ import {
     getOrders,
     getOrdersByUser,
     updateOrder,
+    updateOrderStatus,
+    updatePaymentStatus,
 } from "../orderController.js";
 
 function makeReqRes(overrides = {}) {
@@ -81,6 +83,35 @@ describe("OrderController", () => {
         });
     });
 
+    describe("getOrderById", () => {
+        it("OR-02 Obtener orden por ID válido", async () => {
+            const { req, res, next } = makeReqRes({ params: { id: "o1" } });
+            mockOrder.findById.mockReturnValue(new MockQuery(sampleOrder));
+
+            await getOrderById(req, res, next);
+            expect(res.json).toHaveBeenCalledWith(sampleOrder);
+        });
+
+        it("OR-03 Orden no encontrada", async () => {
+            const { req, res, next } = makeReqRes({ params: { id: "xxx" } });
+            mockOrder.findById.mockReturnValue(new MockQuery(null));
+
+            await getOrderById(req, res, next);
+            expect(res.status).toHaveBeenCalledWith(404);
+            expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: "Order not found" }));
+        });
+    });
+
+    describe("getOrdersByUser", () => {
+        it("OR-06 Obtener órdenes del usuario", async () => {
+            const { req, res, next } = makeReqRes({ params: { userId: "u1" } });
+            mockOrder.find.mockReturnValue(new MockQuery([sampleOrder]));
+
+            await getOrdersByUser(req, res, next);
+            expect(res.json).toHaveBeenCalledWith([sampleOrder]);
+        });
+    });
+
     describe("createOrder", () => {
         const body = {
             user: "u1",
@@ -112,6 +143,67 @@ describe("OrderController", () => {
         });
     });
 
+    describe("updateOrder", () => {
+        it("OR-07 Actualización exitosa", async () => {
+            const { req, res, next } = makeReqRes({ params: { id: "o1" }, body: { status: "processing" } });
+            mockOrder.findByIdAndUpdate.mockReturnValue(new MockQuery({ ...sampleOrder, status: "processing" }));
+
+            await updateOrder(req, res, next);
+            expect(res.status).toHaveBeenCalledWith(200);
+        });
+
+        it("Sin campos para actualizar → 400", async () => {
+            const { req, res, next } = makeReqRes({ params: { id: "o1" }, body: { invalidField: "xxx" } });
+
+            await updateOrder(req, res, next);
+            expect(res.status).toHaveBeenCalledWith(400);
+        });
+
+        it("Orden no encontrada", async () => {
+            const { req, res, next } = makeReqRes({ params: { id: "xxx" }, body: { status: "processing" } });
+            mockOrder.findByIdAndUpdate.mockReturnValue(new MockQuery(null));
+
+            await updateOrder(req, res, next);
+            expect(res.status).toHaveBeenCalledWith(404);
+        });
+    });
+
+    describe("updateOrderStatus", () => {
+        it("OR-09 Actualizar estado", async () => {
+            const { req, res, next } = makeReqRes({ params: { id: "o1" }, body: { status: "delivered" } });
+            mockOrder.findByIdAndUpdate.mockReturnValue(new MockQuery({ ...sampleOrder, status: "delivered" }));
+
+            await updateOrderStatus(req, res, next);
+            expect(res.status).toHaveBeenCalledWith(200);
+        });
+
+        it("Orden no encontrada en update status", async () => {
+            const { req, res, next } = makeReqRes({ params: { id: "xxx" }, body: { status: "delivered" } });
+            mockOrder.findByIdAndUpdate.mockReturnValue(new MockQuery(null));
+
+            await updateOrderStatus(req, res, next);
+            expect(res.status).toHaveBeenCalledWith(404);
+        });
+    });
+
+    describe("updatePaymentStatus", () => {
+        it("OR-10 Actualizar estado de pago", async () => {
+            const { req, res, next } = makeReqRes({ params: { id: "o1" }, body: { paymentStatus: "paid" } });
+            mockOrder.findByIdAndUpdate.mockReturnValue(new MockQuery({ ...sampleOrder, paymentStatus: "paid" }));
+
+            await updatePaymentStatus(req, res, next);
+            expect(res.status).toHaveBeenCalledWith(200);
+        });
+
+        it("Orden no encontrada en update payment", async () => {
+            const { req, res, next } = makeReqRes({ params: { id: "xxx" }, body: { paymentStatus: "paid" } });
+            mockOrder.findByIdAndUpdate.mockReturnValue(new MockQuery(null));
+
+            await updatePaymentStatus(req, res, next);
+            expect(res.status).toHaveBeenCalledWith(404);
+        });
+    });
+
     describe("cancelOrder", () => {
         it("OR-07 Cancelar orden → restaura stock", async () => {
             const { req, res, next } = makeReqRes({ params: { id: "o1" } });
@@ -128,6 +220,24 @@ describe("OrderController", () => {
             expect(mockProduct.findByIdAndUpdate).toHaveBeenCalledWith("p1", { $inc: { stock: 1 } }, { new: true });
             expect(res.status).toHaveBeenCalledWith(200);
         });
+
+        it("OR-08 Orden no encontrada al cancelar", async () => {
+            const { req, res, next } = makeReqRes({ params: { id: "xxx" } });
+            mockOrder.findById.mockReturnValue(new MockQuery(null));
+
+            await cancelOrder(req, res, next);
+            expect(res.status).toHaveBeenCalledWith(404);
+        });
+
+        it("OR-11 Orden ya cancelada", async () => {
+            const { req, res, next } = makeReqRes({ params: { id: "o1" } });
+            mockOrder.findById.mockReturnValue(new MockQuery({ ...sampleOrder, status: "cancelled" }));
+
+            await cancelOrder(req, res, next);
+
+            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: expect.stringContaining("Cannot cancel order") }));
+        });
     });
 
     describe("deleteOrder", () => {
@@ -139,6 +249,25 @@ describe("OrderController", () => {
 
             expect(res.status).toHaveBeenCalledWith(400);
             expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ message: "Only cancelled orders can be deleted" }));
+        });
+
+        it("Eliminación exitosa", async () => {
+            const { req, res, next } = makeReqRes({ params: { id: "o1" } });
+            mockOrder.findById.mockResolvedValue({ status: "cancelled" });
+            mockOrder.findByIdAndDelete.mockResolvedValue({ _id: "o1" });
+
+            await deleteOrder(req, res, next);
+
+            expect(res.status).toHaveBeenCalledWith(204);
+        });
+
+        it("Orden no encontrada en delete", async () => {
+            const { req, res, next } = makeReqRes({ params: { id: "xxx" } });
+            mockOrder.findById.mockResolvedValue(null);
+
+            await deleteOrder(req, res, next);
+
+            expect(res.status).toHaveBeenCalledWith(404);
         });
     });
 });

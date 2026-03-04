@@ -1,8 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 
-describe('PaymentMethodController (skeleton)', () => {
+// PaymentMethodController unit tests (basic existence checks)
+import * as PaymentMethodController from '../paymentMethodController.js'
+
+describe('PaymentMethodController', () => {
   beforeEach(() => vi.clearAllMocks())
-  it('sanity placeholder', () => {
-    expect(true).toBe(true)
+  it('exports available methods', () => {
+    expect(typeof PaymentMethodController.createPaymentMethod).toBe('function')
   })
 })

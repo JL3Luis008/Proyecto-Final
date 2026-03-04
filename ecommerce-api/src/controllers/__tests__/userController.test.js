@@ -218,7 +218,26 @@ describe("UserController", () => {
 
       expect(mockUserFind).toHaveBeenCalledWith({ isActive: true });
     });
+
+    it("US-07 BD falla → next(error)", async () => {
+      req.query = { page: 1, limit: 10 };
+      const dbError = new Error("Database failure");
+
+      const mockQuery = {
+        select: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        skip: vi.fn().mockReturnThis(),
+        sort: vi.fn().mockRejectedValue(dbError),
+      };
+
+      mockUserFind.mockReturnValue(mockQuery);
+
+      await getAllUsers(req, res, next);
+
+      expect(next).toHaveBeenCalledWith(dbError);
+    });
   });
+
 
   describe("getUserById", () => {
     it("should return user by ID", async () => {
@@ -396,7 +415,23 @@ describe("UserController", () => {
       });
       expect(mockBcryptHash).not.toHaveBeenCalled();
     });
+
+    it("US-16 ChangePassword BD falla → next(error)", async () => {
+      req.user = { userId: "user123" };
+      req.body = {
+        currentPassword: "oldPassword",
+        newPassword: "newPassword123",
+      };
+
+      const dbError = new Error("DB down");
+      mockUserFindById.mockRejectedValue(dbError);
+
+      await changePassword(req, res, next);
+
+      expect(next).toHaveBeenCalledWith(dbError);
+    });
   });
+
 
   describe("updateUser", () => {
     it("should update user by admin successfully", async () => {

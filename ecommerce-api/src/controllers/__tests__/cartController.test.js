@@ -115,7 +115,12 @@ describe("CartController", () => {
         it("CA-03b BD falla → next(error) en getCartByUser", async () => {
             const { req, res, next } = makeReqRes({ params: { id: "u2" } });
             const dbError = new Error("DB error");
-            mockCart.findOne.mockRejectedValue(dbError);
+            // Mock rejection at the populate level (since controller chains .populate())
+            mockCart.findOne.mockReturnValue({
+                populate: vi.fn().mockReturnValue({
+                    populate: vi.fn().mockRejectedValue(dbError)
+                })
+            });
             await getCartByUser(req, res, next);
             expect(next).toHaveBeenCalledWith(dbError);
             expect(res.status).not.toHaveBeenCalled();
