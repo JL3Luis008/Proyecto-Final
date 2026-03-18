@@ -32,5 +32,25 @@ Sin embargo, el componente `/settings` era un cascarón vacío (`Settings.jsx`) 
 - Se añadió validación en el cliente para la longitud mínima de contraseña (6 caracteres) y confirmación de igualdad para prevenir errores de tipeo accidentales antes de mandar los payloads al backend.
 - Modificar correo (`email`) fue bloqueado desde frontend (disabled) en consistencia con el backend que usa el correo como identificador primario en estrategias JWT.
 
-## Resultados
-- Feature completado. El usuario ya cuenta con panel de control.
+## Pendientes Abiertos y Gaps Detectados
+- **Funcionalidades faltantes:** La pestaña de "Preferencias" (Modo Oscuro, Notificaciones) quedó como un esqueleto visual sin lógica funcional subyacente.
+- **Comportamientos inconsistentes:** El avatar se sube correctamente y genera URL, pero no se aplica una validación de peso máximo en el cliente antes de la subida, delegando todo al servidor.
+- **Trabajo fuera de alcance:** Implementación de persistencia de "Preferencias" en el modelo de Usuario.
+- **Items para backlog:** Desarrollar el sistema de preferencias del usuario y añadir validación de imagen en el cliente (resizing).
+
+## Resultados (se completa al cerrar)
+- **Fecha de cierre:** 2026-03-16
+- **CAs cumplidos:** 5/5
+- **CAs no cumplidos:** 0
+- **Deuda técnica generada:** Componente Settings.jsx algo extenso; podría modularizarse en sub-componentes por pestaña en una futura iteración.
+- **Lecciones aprendidas:** Mantener la lógica de mutación en el AuthContext facilitó la sincronización inmediata del avatar en el Header sin llamadas extra.
+- **Backlog derivado creado:** SI (en `task.md` -> F-303 parcial).
+
+## Matriz de cierre
+| Item detectado | Estado | Acción |
+|---|---|---|
+| Perfil (Nombre/Tel) | Confirmado | Cerrar |
+| Password Change | Confirmado | Cerrar |
+| Upload Avatar | Confirmado | Cerrar |
+| Preferencias UI | Parcial | Crear backlog |
+| Validación Imagen | Fuera de alcance | Crear backlog |

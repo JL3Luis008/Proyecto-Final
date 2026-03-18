@@ -36,5 +36,25 @@ Se implementó `WishlistContext.jsx` que **descarga la lista 1 sola vez por sesi
 - `ProductCard.jsx`, `WishList.jsx`, `App.jsx`
 - Backend endpoints: `/api/wishList`
 
-## Resultados
-- Feature completado y testeado conceptualmente bajo arquitectura React moderna.
+## Pendientes Abiertos y Gaps Detectados
+- **Funcionalidades faltantes:** No se implementó un sistema de "Compartir Wishlist" (pública/privada), lo cual estaba fuera del alcance inicial pero es una mejora deseada.
+- **Comportamientos inconsistentes:** Al eliminar un item desde la página de Wishlist, el contador en el Header se actualiza, pero si hay múltiples pestañas abiertas, la sincronización entre pestañas depende de un refresh manual (falta `BroadcastChannel` o similar).
+- **Gaps Frontend/Backend:** El backend permite duplicados si se envían múltiples peticiones seguidas muy rápido (race condition), aunque el frontend lo previene visualmente.
+- **Items para backlog:** Implementar sincronización entre pestañas (Storage Events) y añadir validación de duplicados estricta en el `save()` del modelo en backend.
+
+## Resultados (se completa al cerrar)
+- **Fecha de cierre:** 2026-03-16
+- **CAs cumplidos:** 5/5
+- **CAs no cumplidos:** 0
+- **Deuda técnica generada:** El `WishlistContext` asume que el usuario nunca tendrá miles de items (carga todo en memoria). Si la lista crece mucho, requerirá paginación.
+- **Lecciones aprendidas:** El uso de Optimistic UI mejoró drásticamente la percepción de velocidad en conexiones lentas.
+- **Backlog derivado creado:** SI (en `task.md` -> F-406 sugerido).
+
+## Matriz de cierre
+| Item detectado | Estado | Acción |
+|---|---|---|
+| Wishlist Context | Confirmado | Cerrar |
+| Toggling ❤️ | Confirmado | Cerrar |
+| Vista WishList | Confirmado | Cerrar |
+| Sincronización Pestañas | Parcial | Crear backlog |
+| Compartir Lista | Fuera de alcance | Archivar |
