@@ -119,4 +119,29 @@ describe('Reviews Integration Tests', () => {
     expect(res.status).toBe(200);
     expect(res.body.message).toBe('Review deleted successfully');
   });
+
+  it('SEC-RE-01: User cannot update or delete another user\'s review (IDOR)', async () => {
+    // 1. Create Review as User B
+    const userB = await User.create({
+      displayName: 'Victim User',
+      email: 'victim_rev@test.com',
+      hashPassword: 'hashed',
+      role: 'customer'
+    });
+
+    const reviewB = await Review.create({
+      user: userB._id,
+      product: product._id,
+      rating: 1,
+      comment: 'B\'s Secret Review'
+    });
+
+    // 2. User A tries to update B's review
+    const res = await request(app)
+      .put(`/api/review/${reviewB._id}`)
+      .set('Authorization', `Bearer ${token}`)
+      .send({ comment: 'Hacked!' });
+
+    expect(res.status).toBe(404); // "Not found" for User A
+  });
 });

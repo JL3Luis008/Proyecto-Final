@@ -1,0 +1,19 @@
+.protected-route-error {
+    text-align: center;
+    padding: 48px;
+    background-color: var(--bg);
+    min-height: 50vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.protected-route-error h2 {
+    color: var(--error);
+    margin-bottom: var(--gap-md);
+}
+
+.protected-route-error p {
+    color: var(--text-muted);
+}

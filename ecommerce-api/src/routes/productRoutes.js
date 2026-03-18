@@ -1,33 +1,35 @@
 import express from "express";
 import {
-    createProduct,
-    deleteProduct,
-    getProductByCategory,
-    getProductById,
-    getProducts,
-    searchProducts,
-    updateProduct,
+  createProduct,
+  deleteProduct,
+  getProductByCategory,
+  getProductById,
+  getProducts,
+  searchProducts,
+  updateProduct,
+  uploadProductImage,
 } from "../controllers/productController.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
 import isAdmin from "../middlewares/isAdminMiddleware.js";
 import validate from "../middlewares/validation.js";
+import { upload } from "../middlewares/uploadMiddleware.js";
 import {
-    bodyMongoIdValidation,
-    imagesUrlValidation,
-    mongoIdValidation,
-    orderValidation,
-    paginationValidation,
-    priceOptionalValidation,
-    priceValidation,
-    productDescriptionValidation,
-    productNameValidation,
-    queryBooleanValidation,
-    queryMongoIdValidation,
-    queryPriceValidation,
-    searchQueryValidation,
-    sortFieldValidation,
-    stockOptionalValidation,
-    stockValidation
+  bodyMongoIdValidation,
+  imagesUrlValidation,
+  mongoIdValidation,
+  orderValidation,
+  paginationValidation,
+  priceOptionalValidation,
+  priceValidation,
+  productDescriptionValidation,
+  productNameValidation,
+  queryBooleanValidation,
+  queryMongoIdValidation,
+  queryPriceValidation,
+  searchQueryValidation,
+  sortFieldValidation,
+  stockOptionalValidation,
+  stockValidation
 } from "../middlewares/validators.js";
 
 const router = express.Router();
@@ -100,6 +102,15 @@ router.delete(
   [mongoIdValidation("id", "Product ID")],
   validate,
   deleteProduct
+);
+
+// Subir imagen de producto (solo admin)
+router.post(
+  "/products/upload",
+  authMiddleware,
+  isAdmin,
+  upload.single('image'),
+  uploadProductImage
 );
 
 export default router;

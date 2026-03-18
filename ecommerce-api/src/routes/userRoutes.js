@@ -12,10 +12,12 @@ import {
   toggleUserStatus,
   updateUser,
   updateUserProfile,
+  uploadUserProfileImage,
 } from "../controllers/userController.js";
 import authMiddleware from "../middlewares/authMiddleware.js"; // Middleware de autenticación
 import isAdmin from "../middlewares/isAdminMiddleware.js"; // Middleware de admin
 import validate from "../middlewares/validation.js";
+import { uploadAvatar } from "../middlewares/uploadMiddleware.js";
 import {
   displayNameValidation,
   emailValidation,
@@ -27,6 +29,7 @@ import {
   roleValidation,
   booleanValidation,
   userDisplayNameValidation,
+  avatarValidation,
   fullPasswordValidation,
   newPasswordValidation,
   confirmPasswordValidation,
@@ -44,7 +47,7 @@ const profileValidations = [
   userDisplayNameValidation(false),
   emailValidation(true),
   phoneValidation(),
-  urlValidation("avatar"),
+  avatarValidation("avatar"),
 ];
 
 // Obtener perfil del usuario autenticado
@@ -96,7 +99,7 @@ router.post(
     emailValidation(),
     fullPasswordValidation(),
     phoneValidation(),
-    urlValidation("avatar"),
+    avatarValidation("avatar"),
     roleValidation(),
     booleanValidation("isActive"),
   ],
@@ -148,14 +151,12 @@ router.patch(
   toggleUserStatus
 );
 
-// Eliminar usuario (solo admin)
-router.delete(
-  "/users/:userId",
+// Subir avatar de usuario (requiere autenticación)
+router.post(
+  "/users/profile/upload",
   authMiddleware,
-  isAdmin,
-  [mongoIdValidation("userId", "User ID")],
-  validate,
-  deleteUser
+  uploadAvatar.single("avatar"),
+  uploadUserProfileImage
 );
 
 export default router;

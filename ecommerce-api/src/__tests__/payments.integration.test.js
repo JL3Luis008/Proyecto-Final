@@ -33,7 +33,7 @@ describe('Payment Methods Integration Tests', () => {
       .post('/api/payment-methods')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        paymentType: 'credit_card',
+        type: 'credit_card',
         cardNumber: '1234567890123456',
         cardHolderName: 'Payer Tester',
         expiryDate: '12/28',
@@ -41,8 +41,7 @@ describe('Payment Methods Integration Tests', () => {
       });
 
     expect(res.status).toBe(201);
-    expect(res.body.message).toBe('Payment method created successfully');
-    expect(res.body.paymentMethod.paymentType).toBe('credit_card');
+    expect(res.body.type).toBe('credit_card');
   });
 
   it('INT-PM-02 should get all payment methods for the authenticated user', async () => {
@@ -50,7 +49,7 @@ describe('Payment Methods Integration Tests', () => {
       .post('/api/payment-methods')
       .set('Authorization', `Bearer ${token}`)
       .send({
-        paymentType: 'paypal',
+        type: 'paypal',
         paypalEmail: 'payer@test.com'
       });
 
@@ -59,46 +58,45 @@ describe('Payment Methods Integration Tests', () => {
       .set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(200);
-    expect(res.body.paymentMethods).toHaveLength(1);
-    expect(res.body.paymentMethods[0].paymentType).toBe('paypal');
+    expect(res.body).toHaveLength(1);
+    expect(res.body[0].type).toBe('paypal');
   });
 
   it('INT-PM-03 should set a payment method as default', async () => {
     const createRes = await request(app)
       .post('/api/payment-methods')
       .set('Authorization', `Bearer ${token}`)
-      .send({ paymentType: 'bank_transfer', bankName: 'Test Bank', accountNumber: '123456789' });
+      .send({ type: 'bank_transfer', bankName: 'Test Bank', accountNumber: '1234567890' });
 
-    const pmId = createRes.body.paymentMethod._id;
+    const pmId = createRes.body._id;
 
     const res = await request(app)
       .patch(`/api/payment-methods/${pmId}/set-default`)
       .set('Authorization', `Bearer ${token}`);
 
     expect(res.status).toBe(200);
-    expect(res.body.paymentMethod.isDefault).toBe(true);
+    expect(res.body.isDefault).toBe(true);
 
     const defRes = await request(app)
       .get('/api/payment-methods/default')
       .set('Authorization', `Bearer ${token}`);
 
     expect(defRes.status).toBe(200);
-    expect(defRes.body.paymentMethod._id.toString()).toBe(pmId);
+    expect(defRes.body._id.toString()).toBe(pmId);
   });
 
   it('INT-PM-04 should delete a payment method', async () => {
     const createRes = await request(app)
       .post('/api/payment-methods')
       .set('Authorization', `Bearer ${token}`)
-      .send({ paymentType: 'paypal', paypalEmail: 'delete@test.com' });
+      .send({ type: 'paypal', paypalEmail: 'delete@test.com' });
 
-    const pmId = createRes.body.paymentMethod._id;
+    const pmId = createRes.body._id;
 
     const res = await request(app)
       .delete(`/api/payment-methods/${pmId}`)
       .set('Authorization', `Bearer ${token}`);
 
-    expect(res.status).toBe(200);
-    expect(res.body.message).toBe('Payment method deleted successfully');
+    expect(res.status).toBe(204);
   });
 });

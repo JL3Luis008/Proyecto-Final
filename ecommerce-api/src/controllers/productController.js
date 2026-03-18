@@ -5,30 +5,30 @@ import errorHandler from '../middlewares/errorHandler.js';
 
 async function getProducts(req, res, next) {
   try {
-   // req.params
-  // req.query
-const page = parseInt(req.query.page) || 1;
-const limit = parseInt(req.query.limit) || 10;
-const skip = (page - 1)*limit;
+    // req.params
+    // req.query
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
 
     const products = await Product.find()
-    .populate('category')
-    .skip(skip)
-    .limit(limit)
-    .sort({ name: 1 });
+      .populate('category')
+      .skip(skip)
+      .limit(limit)
+      .sort({ name: 1 });
 
     const totalResult = await Product.countDocuments();
-    const totalPages = Math.ceil(totalResult/limit);
+    const totalPages = Math.ceil(totalResult / limit);
 
     res.json({
-      products, 
+      products,
       pagination: {
-          currentPage: page,
-          totalPages,
-          totalResult,
-          hasNext: page < totalPages,
-          hasPrev: page > 1,
-          }
+        currentPage: page,
+        totalPages,
+        totalResult,
+        hasNext: page < totalPages,
+        hasPrev: page > 1,
+      }
     });
   } catch (error) {
     next(error);
@@ -47,7 +47,7 @@ async function getProductById(req, res, next) {
   }
 }
 
-async function getProductByCategory(req, res, next ) {
+async function getProductByCategory(req, res, next) {
   try {
     const id = req.params.idCategory;
     const products = await Product
@@ -59,7 +59,7 @@ async function getProductByCategory(req, res, next ) {
     }
     res.json(products);
   } catch (error) {
-    res.status(500).json({ error });
+    next(error);
   }
 }
 
@@ -67,33 +67,19 @@ async function createProduct(req, res, next) {
   try {
     const { name, description, company, price, stock, imagesUrl, category } = req.body;
 
-if (!name) return res.status(400).json({ error: 'Name is required' });
-if (!description) return res.status(400).json({ error: 'Description is required' });
-if (!company) return res.status(400).json({ error: 'company is required' });
-if (!price) return res.status(400).json({ error: 'Price is required' });
-if (!stock) return res.status(400).json({ error: 'Stock is required' });
-if (!imagesUrl) return res.status(400).json({ error: 'Images URL is required' });
-
     const newProduct = await Product.create({ name, description, company, price, stock, imagesUrl, category });
     res.status(201).json(newProduct);
   } catch (error) {
     next(error);
   }
 }
-async function updateProduct(req, res, next ) {
+async function updateProduct(req, res, next) {
   try {
     const id = req.params.id;
-    const { name, description, console, price, stock, imagesUrl, category } = req.body;
-
-if (!name) return res.status(400).json({ error: 'Name is required' });
-if (!description) return res.status(400).json({ error: 'Description is required' });
-if (!console) return res.status(400).json({ error: 'Console is required' });
-if (!price) return res.status(400).json({ error: 'Price is required' });
-if (!stock) return res.status(400).json({ error: 'Stock is required' });
-if (!imagesUrl) return res.status(400).json({ error: 'Images URL is required' });
+    const { name, description, company, price, stock, imagesUrl, category } = req.body;
 
     const updatedProduct = await Product.findByIdAndUpdate(id,
-      { name, description, console, price, stock, imagesUrl, category },
+      { name, description, company, price, stock, imagesUrl, category },
       { new: true },
     );
 
@@ -105,7 +91,7 @@ if (!imagesUrl) return res.status(400).json({ error: 'Images URL is required' })
     next(error);
   }
 }
-async function deleteProduct(req, res, next ) {
+async function deleteProduct(req, res, next) {
   try {
     const id = req.params.id;
     const deletedProduct = await Product.findByIdAndDelete(id);
@@ -132,7 +118,6 @@ async function searchProducts(req, res, next) {
       page = 1,
       limit = 10,
     } = req.query;
-    console.log(inStock);
 
     let filters = {};
 
@@ -154,9 +139,9 @@ async function searchProducts(req, res, next) {
       if (maxPrice) filters.price.$lte = parseFloat(maxPrice);
     }
     const bool = Boolean(inStock);
-    if (inStock==='true') {
+    if (inStock === 'true') {
       filters.stock = { $gt: 0 };
-    }else{
+    } else {
       filters.stock = { $gte: 0 };
     }
 
@@ -167,8 +152,8 @@ async function searchProducts(req, res, next) {
     } else {
       sortOptions.createdAt = -1;
     }
-                
-    const skip = (parseInt(page) - 1 )* parseInt(limit);
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
 
     const products = await Product.find(filters)
       .populate("category")
@@ -205,6 +190,23 @@ async function searchProducts(req, res, next) {
   }
 }
 
+async function uploadProductImage(req, res, next) {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    // URL to access the file (relative to the server)
+    const imageUrl = `/uploads/products/${req.file.filename}`;
+
+    res.status(200).json({
+      message: 'Image uploaded successfully',
+      imageUrl
+    });
+  } catch (error) {
+    next(error);
+  }
+}
 
 
 export {
@@ -215,4 +217,5 @@ export {
   updateProduct,
   deleteProduct,
   searchProducts,
+  uploadProductImage,
 }

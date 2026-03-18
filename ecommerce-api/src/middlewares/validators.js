@@ -72,6 +72,19 @@ export const descriptionValidation = (field = "description") =>
 export const urlValidation = (field = "url") =>
   body(field).optional().isURL().withMessage(`${field} must be a valid URL`);
 
+export const avatarValidation = (field = "avatar") =>
+  body(field)
+    .optional()
+    .custom((value) => {
+      if (!value) return true;
+      const isUrl = /^(http|https):\/\/[^\s$.?#].[^\s]*$/.test(value);
+      const isLocalPath = value.startsWith("/uploads/");
+      if (!isUrl && !isLocalPath) {
+        throw new Error(`${field} must be a valid URL or local path`);
+      }
+      return true;
+    });
+
 // Validación de MongoID en body (no en param)
 export const bodyMongoIdValidation = (field, label, optional = false) => {
   const validator = body(field).isMongoId().withMessage(`Invalid ${label} format`);
@@ -347,25 +360,30 @@ export const stockOptionalValidation = () =>
 // Validación de array de URLs de imágenes
 export const imagesUrlValidation = (required = true) => {
   const validators = [
-    body("imagesUrl").isArray({ min: 1 }).withMessage("At least one image URL is required"),
-    body("imagesUrl.*").isURL().withMessage("Each image must be a valid URL"),
+    body("imagesUrl").isArray({ min: 1 }).withMessage("At least one image is required"),
+    body("imagesUrl.*").custom((value) => {
+      // Allow valid URLs or local paths starting with /uploads
+      const isUrl = /^(http|https):\/\/[^\s$.?#].[^\s]*$/.test(value);
+      const isLocalPath = value.startsWith('/uploads/');
+      if (!isUrl && !isLocalPath) {
+        throw new Error("Each image must be a valid URL or local path");
+      }
+      return true;
+    }),
   ];
 
   if (required) {
     validators[0] = body("imagesUrl")
       .notEmpty()
-      .withMessage("Images URL is required")
+      .withMessage("Images are required")
       .isArray({ min: 1 })
-      .withMessage("At least one image URL is required");
+      .withMessage("At least one image is required");
   } else {
     validators[0] = body("imagesUrl")
       .optional()
       .isArray({ min: 1 })
-      .withMessage("At least one image URL is required");
-    validators[1] = body("imagesUrl.*")
-      .optional()
-      .isURL()
-      .withMessage("Each image must be a valid URL");
+      .withMessage("At least one image is required");
+    // For optional, the second validator already handles the pattern check if present
   }
 
   return validators;
@@ -384,8 +402,8 @@ export const productNameValidation = (required = true) => {
 // Validación de descripción de producto
 export const productDescriptionValidation = (required = true) => {
   const validator = body("description")
-    .isLength({ min: 10, max: 1000 })
-    .withMessage("Description must be between 10 and 1000 characters")
+    .isLength({ min: 5, max: 2000 })
+    .withMessage("Description must be between 5 and 2000 characters")
     .trim();
 
   return required

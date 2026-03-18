@@ -18,19 +18,15 @@ export const cartInitialState = {
 
 export function cartReducer(state, action) {
   switch (action.type) {
-    case CART_ACTIONS.INIT: {
-      const items = action.payload || [];
-      return { ...state, items };
-    }
     case CART_ACTIONS.ADD: {
       const p = action.payload; //{id,name,price,image,}
       const exists = state.items.find((i) => i._id === p._id);
       const items = exists
         ? state.items.map((i) =>
-            i._id === p._id
-              ? { ...i, quantity: i.quantity + (p.quantity || 1) }
-              : i,
-          )
+          i._id === p._id
+            ? { ...i, quantity: i.quantity + (p.quantity || 1) }
+            : i,
+        )
         : [...state.items, { ...p, quantity: p.quantity || 1 }];
       return { ...state, items };
     }
@@ -50,6 +46,14 @@ export function cartReducer(state, action) {
     }
     case CART_ACTIONS.CLEAR: {
       return { ...state, items: [] };
+    }
+    case CART_ACTIONS.INIT: {
+      const items = action.payload.map(item => ({
+        ...item.product,
+        quantity: item.quantity,
+        _id: item.product._id // Ensure top-level _id for the app
+      }));
+      return { ...state, items };
     }
     default:
       return state;

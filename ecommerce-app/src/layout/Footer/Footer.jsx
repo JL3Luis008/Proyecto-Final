@@ -1,5 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
-import Icon from "../../components/common/Icon/Icon";
+import { Icon } from "../../components/atoms";
+
 import "./Footer.css";
 
 export default function Footer() {

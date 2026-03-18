@@ -381,6 +381,24 @@ const createUser = async (req, res, next) => {
   }
 };
 
+const uploadUserProfileImage = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    // URL to access the file (relative to the server)
+    const imageUrl = `/uploads/avatars/${req.file.filename}`;
+
+    res.status(200).json({
+      message: "Avatar uploaded successfully",
+      imageUrl,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export {
   changePassword,
   createUser,
@@ -393,4 +411,5 @@ export {
   toggleUserStatus,
   updateUser,
   updateUserProfile,
+  uploadUserProfileImage,
 };

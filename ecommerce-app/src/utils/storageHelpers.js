@@ -37,12 +37,16 @@ export const normalizeAddress = (addr, idx = 0) => {
 
   return {
     name: addr.name || "",
-    address1: addr.address1 || "",
+    // API devuelve `address`; el formulario UI usa `address1`
+    address1: addr.address1 || addr.address || "",
     address2: addr.address2 || "",
     postalCode: addr.postalCode || "",
     city: addr.city || "",
+    state: addr.state || "",
     country: addr.country || "",
+    phone: addr.phone || "",
     reference: addr.reference || "",
+    addressType: addr.addressType || "home",
     ...addr,
     id,
     default: isDefault,

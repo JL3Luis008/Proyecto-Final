@@ -1,0 +1,9 @@
+.home-container {
+    padding-bottom: var(--gap-lg);
+}
+
+.home-controls {
+    display: flex;
+    justify-content: flex-end;
+    padding: var(--gap-md);
+}

@@ -23,21 +23,16 @@ import {
 
 const router = express.Router();
 
-router.get("/cart", authMiddleware, isAdmin, getCarts);
+// --- SPECIFIC ROUTES ---
 
-router.get(
-  "/cart/user/:id",
-  authMiddleware,
-  [mongoIdValidation("id", "User ID")],
-  validate,
-  getCartByUser,
-);
+// Get current user's cart
+router.get("/cart/my-cart", authMiddleware, getCartByUser);
 
+// Add product to cart (uses session userId)
 router.post(
   "/cart/add-product",
   authMiddleware,
   [
-    bodyMongoIdValidation("userId", "User ID"),
     bodyMongoIdValidation("productId", "Product ID"),
     quantityValidation("quantity", true),
   ],
@@ -45,20 +40,55 @@ router.post(
   addProductToCart,
 );
 
+// Update item quantity in session cart
+router.put(
+  "/cart/update-item",
+  authMiddleware,
+  [
+    bodyMongoIdValidation("productId", "Product ID"),
+    quantityValidation("quantity", true),
+  ],
+  validate,
+  updateCartItem,
+);
+
+// Remove item from session cart
+router.delete(
+  "/cart/remove-item/:productId",
+  authMiddleware,
+  [
+    mongoIdValidation("productId", "Product ID"),
+  ],
+  validate,
+  removeCartItem,
+);
+
+// Clear session cart
+router.post(
+  "/cart/clear",
+  authMiddleware,
+  clearCartItems,
+);
+
+// Admin only: Get all carts
+router.get("/cart", authMiddleware, isAdmin, getCarts);
+
+// --- PARAMETERIZED ROUTES ---
+
+// Get specific cart by ID (Admin or Owner)
 router.get(
   "/cart/:id",
   authMiddleware,
-  isAdmin,
   [mongoIdValidation("id", "Cart ID")],
   validate,
   getCartById,
 );
 
+// Create cart
 router.post(
   "/cart",
   authMiddleware,
   [
-    bodyMongoIdValidation("user", "User"),
     body("products")
       .notEmpty()
       .withMessage("Products are required")
@@ -71,12 +101,12 @@ router.post(
   createCart,
 );
 
+// Update cart
 router.put(
-  "/cart-item/:id",
+  "/cart/:id",
   authMiddleware,
   [
     mongoIdValidation("id", "Cart ID"),
-    bodyMongoIdValidation("user", "User ID", true),
     body("products")
       .optional()
       .isArray({ min: 1 })
@@ -88,44 +118,13 @@ router.put(
   updateCart,
 );
 
+// Delete cart
 router.delete(
   "/cart/:id",
   authMiddleware,
   [mongoIdValidation("id", "Cart ID")],
   validate,
   deleteCart,
-);
-
-// Rutas nuevas
-router.put(
-  "/cart/update-item",
-  authMiddleware,
-  [
-    bodyMongoIdValidation("userId", "User ID"),
-    bodyMongoIdValidation("productId", "Product ID"),
-    quantityValidation("quantity", true),
-  ],
-  validate,
-  updateCartItem,
-);
-
-router.delete(
-  "/cart/remove-item/:productId",
-  authMiddleware,
-  [
-    mongoIdValidation("productId", "Product ID"),
-    bodyMongoIdValidation("userId", "User ID"),
-  ],
-  validate,
-  removeCartItem,
-);
-
-router.post(
-  "/cart/clear",
-  authMiddleware,
-  [bodyMongoIdValidation("userId", "User ID")],
-  validate,
-  clearCartItems,
 );
 
 export default router;

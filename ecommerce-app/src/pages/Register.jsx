@@ -1,5 +1,6 @@
 //import { useLocation, useNavigate } from "react-router-dom";
-import RegisterForm from "../components/RegisterForm/RegisterForm";
+import { RegisterForm } from "../components/organisms";
+
 
 export default function Register() {
   //const location = useLocation();
@@ -12,7 +13,8 @@ export default function Register() {
 
 
 /* import { useLocation, useNavigate } from "react-router-dom";
-import RegisterForm from "../components/RegisterForm/RegisterForm";
+import { RegisterForm } from "../components/organisms";
+
 
 export default function Register() {
   const location = useLocation();

@@ -1,5 +1,6 @@
 # AGENTS.md — ecommerce-api (Retro-Bits)
 > Generado con análisis profundo del código real. Febrero 2026.
+> **⚠️ IMPORTANTE:** Los agentes operan bajo el **SSDLC — Protocolo Operativo de Desarrollo Seguro** de estándar industrial. Lee `docs/MANUAL_OPERATIVO.md` (Sección 1) antes de cualquier tarea.
 
 ---
 

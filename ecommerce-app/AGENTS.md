@@ -1,5 +1,7 @@
 # AGENTS.md — ecommerce-app (Retro-Bits)
 > Generado con análisis profundo del código real. Febrero 2026.
+> **Documentation Source (NotebookLM):** [RetroBits.com](https://notebooklm.google/)
+> **⚠️ IMPORTANTE:** Los agentes operan bajo el **SSDLC — Protocolo Operativo de Desarrollo Seguro** de estándar industrial. Lee `docs/MANUAL_OPERATIVO.md` (Sección 1) antes de cualquier tarea.
 
 ---
 

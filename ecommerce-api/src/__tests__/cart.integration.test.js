@@ -37,12 +37,14 @@ describe('Cart Integration Tests (INT-CA)', () => {
             .post('/api/cart/add-product')
             .set('Authorization', `Bearer ${token}`)
             .send({
-                userId,
-                productId,
+                productId: productId.toString(),
                 quantity: 2
             });
 
-        expect(res.status).toBe(200);
+        if (res.status !== 200) {
+            throw new Error(`INT-CA-01 Failed: ${JSON.stringify(res.body)}`);
+        }
+
         expect(res.body.cart.products).toHaveLength(1);
         expect(res.body.cart.products[0].quantity).toBe(2);
 
@@ -56,19 +58,21 @@ describe('Cart Integration Tests (INT-CA)', () => {
         await request(app)
             .post('/api/cart/add-product')
             .set('Authorization', `Bearer ${token}`)
-            .send({ userId, productId, quantity: 1 });
+            .send({ productId: productId.toString(), quantity: 1 });
 
         // Luego actualizar
         const res = await request(app)
             .put('/api/cart/update-item')
             .set('Authorization', `Bearer ${token}`)
             .send({
-                userId,
-                productId,
+                productId: productId.toString(),
                 quantity: 5
             });
 
-        expect(res.status).toBe(200);
+        if (res.status !== 200) {
+            throw new Error(`INT-CA-02 Failed: ${JSON.stringify(res.body)}`);
+        }
+
         expect(res.body.cart.products[0].quantity).toBe(5);
     });
 
@@ -77,14 +81,25 @@ describe('Cart Integration Tests (INT-CA)', () => {
         await request(app)
             .post('/api/cart/add-product')
             .set('Authorization', `Bearer ${token}`)
-            .send({ userId, productId, quantity: 1 });
+            .send({ productId, quantity: 1 });
 
         const res = await request(app)
             .post('/api/cart/clear')
             .set('Authorization', `Bearer ${token}`)
-            .send({ userId });
+            .send({});
 
         expect(res.status).toBe(200);
         expect(res.body.cart.products).toHaveLength(0);
+    });
+
+    it('INT-CA-04 Obtener mi carrito', async () => {
+        const res = await request(app)
+            .get('/api/cart/my-cart')
+            .set('Authorization', `Bearer ${token}`);
+
+        if (res.status !== 200) {
+            throw new Error(`INT-CA-04 Failed status: ${res.status} Body: ${JSON.stringify(res.body)}`);
+        }
+        expect(res.body.message).toBe("No cart found for this user");
     });
 });

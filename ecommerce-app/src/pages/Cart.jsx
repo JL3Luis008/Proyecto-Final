@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import CartView from "../components/Cart/CartView";
-import Button from "../components/common/Button";
-import Icon from "../components/common/Icon/Icon";
+import { CartView } from "../components/organisms";
+import { Button, Icon } from "../components/atoms";
+
 import { useCart } from "../context/CartContext";
 import "./Cart.css";
 

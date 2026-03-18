@@ -18,14 +18,24 @@ async function getOrders(req, res, next) {
 async function getOrderById(req, res, next) {
   try {
     const id = req.params.id;
+    const userId = req.user.userId;
+    const userRole = req.user.role;
+
     const order = await Order.findById(id)
       .populate("user")
       .populate("products.productId")
       .populate("shippingAddress")
       .populate("paymentMethod");
+
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
+
+    // Authorization check: Admin can see everything, Customers only their own
+    if (userRole !== "admin" && order.user._id.toString() !== userId) {
+      return res.status(403).json({ message: "Access denied. This order does not belong to you." });
+    }
+
     res.json(order);
   } catch (error) {
     next(error);
@@ -34,13 +44,21 @@ async function getOrderById(req, res, next) {
 
 async function getOrdersByUser(req, res, next) {
   try {
-    const userId = req.params.userId;
+    const { userId } = req.params;
+    const requesterId = req.user.userId;
+    const requesterRole = req.user.role;
+
+    // Authorization check
+    if (requesterRole !== "admin" && userId !== requesterId) {
+      return res.status(403).json({ message: "Access denied. You can only view your own orders." });
+    }
+
     const orders = await Order.find({ user: userId })
       .populate("user")
       .populate("products.productId")
       .populate("shippingAddress")
       .populate("paymentMethod")
-      .sort({ status: 1 });
+      .sort({ createdAt: -1 });
 
     res.json(orders);
   } catch (error) {
@@ -50,7 +68,8 @@ async function getOrdersByUser(req, res, next) {
 
 async function createOrder(req, res, next) {
   try {
-    const { user, products, shippingAddress, paymentMethod, shippingCost = 0 } = req.body;
+    const userId = req.user.userId;
+    const { products, shippingAddress, paymentMethod, shippingCost = 0 } = req.body;
 
     // Verificar stock de todos los productos ANTES de crear la orden
     const stockChecks = await Promise.all(
@@ -133,7 +152,7 @@ async function createOrder(req, res, next) {
     const totalPrice = subtotal + shippingCost;
 
     const newOrder = await Order.create({
-      user,
+      user: userId,
       products: normalizedProducts,
       shippingAddress,
       paymentMethod,
@@ -328,14 +347,14 @@ async function deleteOrder(req, res, next) {
 }
 
 export {
-    cancelOrder,
-    createOrder,
-    deleteOrder,
-    getOrderById,
-    getOrders,
-    getOrdersByUser,
-    updateOrder,
-    updateOrderStatus,
-    updatePaymentStatus
+  cancelOrder,
+  createOrder,
+  deleteOrder,
+  getOrderById,
+  getOrders,
+  getOrdersByUser,
+  updateOrder,
+  updateOrderStatus,
+  updatePaymentStatus
 };
 
