@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import Icon from "../components/common/Icon/Icon";
+import { Icon } from "../components/atoms";
+
 import { useCart } from "../context/CartContext";
 import "./OrderConfirmation.css";
 
@@ -28,7 +29,7 @@ export default function OrderConfirmation() {
       }
       clearedRef.current = true;
     }
-  }, [order, navigate]);
+  }, [order, navigate, clearCart]);
 
   if (!order) return null;
 
@@ -41,10 +42,10 @@ export default function OrderConfirmation() {
   const money = (v) =>
     typeof v === "number"
       ? new Intl.NumberFormat("es-MX", {
-          style: "currency",
-          currency: "MXN",
-          minimumFractionDigits: 2,
-        }).format(v)
+        style: "currency",
+        currency: "MXN",
+        minimumFractionDigits: 2,
+      }).format(v)
       : "$0.00";
 
   const address = order.shippingAddress || {};
@@ -76,7 +77,7 @@ export default function OrderConfirmation() {
               {(order.items || []).map((it) => (
                 <li key={it._id || it.id || it.name}>
                   {it.name} x{it.quantity} — {money(it.price)}
-                  <span style={{ float: "right" }}>{money(it.subtotal)}</span>
+                  <span className="item-subtotal">{money(it.subtotal)}</span>
                 </li>
               ))}
             </ul>

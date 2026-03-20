@@ -3,52 +3,48 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: var(--gap);
+  padding: var(--gap-md);
 }
 
 .confirmation-content {
   text-align: center;
   max-width: 600px;
-  padding: calc(var(--gap) * 2);
+  padding: var(--gap-lg);
   background: var(--surface);
-  border-radius: var(--radius);
+  border-radius: var(--radius-md);
   border: 1px solid var(--border);
-  box-shadow: var(--elev-1);
-}
-
-.confirmation-icon {
-  margin-bottom: var(--gap);
+  box-shadow: var(--shadow-sm);
 }
 
 .confirmation-icon .success {
-  color: var(--color-green);
+  color: var(--success);
 }
 
 .confirmation-content h1 {
   font-size: clamp(24px, 3vw, 30px);
   font-weight: 600;
-  margin-bottom: var(--gap);
+  margin-bottom: var(--gap-md);
   color: var(--text);
   letter-spacing: -0.4px;
 }
 
 .confirmation-message {
   font-size: clamp(16px, 2vw, 18px);
-  color: var(--accent);
-  margin-bottom: calc(var(--gap) * 1.5);
+  color: var(--primary);
+  margin-bottom: var(--gap-lg);
 }
 
 .confirmation-details {
-  color: var(--muted);
-  margin-bottom: calc(var(--gap) * 2);
+  color: var(--text-muted);
+  margin-bottom: var(--gap-lg);
   background: var(--bg);
-  padding: var(--gap);
-  border-radius: var(--radius);
+  padding: var(--gap-md);
+  border-radius: var(--radius-md);
   text-align: left;
 }
 
 .order-info {
-  margin: var(--gap) 0;
+  margin: var(--gap-md) 0;
 }
 
 .order-info p {
@@ -64,17 +60,17 @@ address {
 
 .confirmation-actions {
   display: flex;
-  gap: var(--gap);
+  gap: var(--gap-md);
   justify-content: center;
-  margin-top: calc(var(--gap) * 1.5);
+  margin-top: var(--gap-lg);
 }
 
 .confirmation-actions .button {
   display: inline-flex;
   align-items: center;
-  gap: calc(var(--gap) * 0.5);
-  padding: calc(var(--gap) * 0.75) var(--gap);
-  border-radius: var(--r2);
+  gap: var(--gap-sm);
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
   font-weight: 500;
   text-decoration: none;
   transition: all 0.2s ease;
@@ -114,4 +110,10 @@ address {
   .confirmation-details {
     padding: calc(var(--gap) * 0.75);
   }
+}
+
+.item-subtotal {
+  float: right;
+  font-weight: 600;
+  color: var(--text);
 }

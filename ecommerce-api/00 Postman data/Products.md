@@ -220,3 +220,16 @@
             },
             "__v": 0
         }
+
+
+
+         {
+    "_id": "68b0p020",
+    "name": "Metal gear solid 3",
+    "description": "historia de big boss , Juego de sigilo para PS1.",
+    "company": "playstation 2",
+    "price": 800,
+    "stock": 2,
+    "imagesUrl": ["https://images.cdn1.buscalibre.com/fit-in/360x360/e6/bd/e6bdad2b72c203a0c1d3764da4f009ef.jpg"],
+    "category": "699ddff318dba31d0937cf8f"
+  }

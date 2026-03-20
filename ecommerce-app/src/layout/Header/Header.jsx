@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Icon from "../../components/common/Icon/Icon";
+import { Icon } from "../../components/atoms";
+
 import { useCart } from "../../context/CartContext";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
@@ -253,9 +254,8 @@ export default function Header() {
                   <Icon
                     name="chevronDown"
                     size={14}
-                    className={`dropdown-arrow ${
-                      isUserMenuOpen ? "rotated" : ""
-                    }`}
+                    className={`dropdown-arrow ${isUserMenuOpen ? "rotated" : ""
+                      }`}
                   />
                 </button>
 
@@ -276,13 +276,14 @@ export default function Header() {
                           <Icon name="logIn" size={16} />
                           Iniciar Sesión
                         </Link>
-                        <button
+                        <Link
+                          to="/register"
                           className="auth-btn secondary"
                           onClick={handleRegister}
                         >
                           <Icon name="userPlus" size={16} />
                           Crear Cuenta
-                        </button>
+                        </Link>
                       </div>
                     ) : (
                       <div className="user-section">

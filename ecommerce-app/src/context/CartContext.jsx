@@ -39,11 +39,7 @@ export function CartProvider({ children }) {
         try {
           const backendCart = await cartService.getCart(user._id);
           if (backendCart?.cart?.products) {
-            const flattenedItems = backendCart.cart.products.map((p) => ({
-              ...p.product,
-              quantity: p.quantity,
-            }));
-            dispatch({ type: CART_ACTIONS.INIT, payload: flattenedItems });
+            dispatch({ type: CART_ACTIONS.INIT, payload: backendCart.cart.products });
           }
         } catch (error) {
           console.error(error);

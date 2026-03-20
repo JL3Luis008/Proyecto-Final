@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
-import Icon from "../../components/common/Icon/Icon";
+import { Icon } from "../../components/atoms";
+
 import "./Breadcrumb.css";
 
 const Breadcrumb = ({ categories = [] }) => {

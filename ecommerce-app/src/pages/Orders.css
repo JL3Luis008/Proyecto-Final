@@ -19,7 +19,7 @@
   letter-spacing: 0.2em;
   font-size: 0.75rem;
   margin: 0;
-  color: var(--muted);
+  color: var(--text-muted);
 }
 
 .orders-header h1 {
@@ -59,7 +59,7 @@
   width: 100%;
   text-align: left;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-md);
   padding: 16px;
   background: var(--surface);
   transition: border-color 0.2s ease, background 0.2s ease;
@@ -72,7 +72,7 @@
 
 .order-card.active {
   border-color: var(--accent);
-  background: rgba(var(--accent-rgb), 0.07);
+  background: color-mix(in srgb, var(--accent) 7%, transparent);
 }
 
 .order-card-head {
@@ -92,32 +92,32 @@
 
 .order-date {
   margin: 0;
-  color: var(--muted);
+  color: var(--text-muted);
 }
 
 .order-status {
   font-size: 0.75rem;
   text-transform: capitalize;
   padding: 4px 8px;
-  border-radius: var(--r2);
-  background: var(--color-light-gray);
+  border-radius: var(--radius-sm);
+  background: var(--neutral-100);
   color: var(--text);
 }
 
 .order-status-confirmed {
-  background: rgba(121, 191, 135, 0.2);
-  color: #166534;
+  background: color-mix(in srgb, var(--success) 20%, transparent);
+  color: var(--success);
 }
 
 .order-status-delivered {
-  background: rgba(62, 183, 234, 0.2);
-  color: #0369a1;
+  background: color-mix(in srgb, var(--info) 20%, transparent);
+  color: var(--info);
 }
 
 .order-status-cancelled,
 .order-status-canceled {
-  background: rgba(220, 38, 38, 0.2);
-  color: #b91c1c;
+  background: color-mix(in srgb, var(--error) 20%, transparent);
+  color: var(--error);
 }
 
 .order-detail-header {
@@ -145,7 +145,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  color: var(--muted);
+  color: var(--text-muted);
 }
 
 .order-summary-total {
@@ -157,7 +157,7 @@
 
 .order-address {
   font-style: normal;
-  color: var(--muted);
+  color: var(--text-muted);
   line-height: 1.4;
 }
 
@@ -174,9 +174,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--gap);
+  gap: var(--gap-md);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-md);
   padding: 12px;
 }
 
@@ -187,7 +187,7 @@
 
 .order-items span {
   font-size: 0.85rem;
-  color: var(--muted);
+  color: var(--text-muted);
 }
 
 .orders-empty {
@@ -199,7 +199,7 @@
   justify-content: center;
   padding: clamp(24px, 5vw, 48px);
   border: 1px dashed var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-md);
 }
 
 .orders-link {

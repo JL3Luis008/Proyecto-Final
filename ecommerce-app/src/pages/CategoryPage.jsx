@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom";
-import CategoryProducts from "../components/CategoryProducts/CategoryProducts";
+import { CategoryProducts } from "../components/organisms";
+
 
 export default function CategoryPage() {
   const { categoryId } = useParams();

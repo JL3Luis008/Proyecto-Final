@@ -1,10 +1,11 @@
-import { describe, expect, it, beforeEach } from 'vitest';
+import { describe, expect, it, beforeAll, afterAll, beforeEach } from 'vitest';
 import request from 'supertest';
 import { app } from '../../server.js';
 import User from '../models/user.js';
 import Product from '../models/product.js';
 import Order from '../models/order.js';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
 
 describe('Order Integration Tests (INT-OR)', () => {
@@ -45,7 +46,6 @@ describe('Order Integration Tests (INT-OR)', () => {
 
     it('INT-OR-01 Crear orden exitosamente (reduce stock)', async () => {
         const orderData = {
-            user: userId,
             products: [{ productId, quantity: 2, price: 60 }],
             shippingAddress: '65dbbe8c9d4b6c3a1c8b4567', // Valid MongoId
             paymentMethod: '65dbbe8c9d4b6c3a1c8b4568', // Valid MongoId
@@ -126,7 +126,9 @@ describe('Order Integration Tests (INT-OR)', () => {
             .get(`/api/orders/user/${userId}`)
             .set('Authorization', `Bearer ${token}`);
 
-        expect(res.status).toBe(200);
+        if (res.status !== 200) {
+            throw new Error(`INT-OR-04 Failed status: ${res.status} Body: ${JSON.stringify(res.body)}`);
+        }
         expect(Array.isArray(res.body)).toBe(true);
         expect(res.body.length).toBeGreaterThanOrEqual(1);
     });
@@ -177,5 +179,31 @@ describe('Order Integration Tests (INT-OR)', () => {
     it('INT-OR-07 Sin token → 401', async () => {
         const res = await request(app).post('/api/orders').send({});
         expect(res.status).toBe(401);
+    });
+
+    it('SEC-OR-01: User cannot view another user\'s order (IDOR)', async () => {
+        // 1. Create Order for User B
+        const userB = await User.create({
+            displayName: 'Victim',
+            email: `victim${Date.now()}@test.com`,
+            hashPassword: 'hashed',
+            role: 'customer'
+        });
+
+        const orderB = await Order.create({
+            user: userB._id,
+            products: [{ productId: new mongoose.Types.ObjectId(), quantity: 1, price: 10 }],
+            shippingAddress: new mongoose.Types.ObjectId(),
+            paymentMethod: new mongoose.Types.ObjectId(),
+            totalPrice: 100,
+            status: 'pending'
+        });
+
+        // 2. Customer Token (User A) tries to view Order B
+        const res = await request(app)
+            .get(`/api/orders/${orderB._id.toString()}`)
+            .set('Authorization', `Bearer ${customerToken}`);
+
+        expect(res.status).toBe(403);
     });
 });

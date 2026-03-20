@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import Button from "../components/common/Button";
-import Icon from "../components/common/Icon/Icon";
-import Loading from "../components/common/Loading/Loading";
+import { Button, Icon, Loading } from "../components/atoms";
+
 import { STORAGE_KEYS, readLocalJSON } from "../utils/storageHelpers";
 import "./Orders.css";
 
@@ -229,7 +228,7 @@ export default function Orders() {
                       <strong>
                         {formatMoney(
                           item.subtotal ||
-                            (item.price || 0) * (item.quantity || 1)
+                          (item.price || 0) * (item.quantity || 1)
                         )}
                       </strong>
                     </li>

@@ -1,37 +1,37 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import Icon from "../../components/common/Icon/Icon";
-import categoriesData from "../../data/categories.json";
+import { Icon } from "../../components/atoms";
+
+import { fetchCategories } from "../../services/categoryService";
 import "./Navigation.css";
 
 const Navigation = ({ isMobile = false, onLinkClick }) => {
   const [categories, setCategories] = useState([]);
+  const [allCategories, setAllCategories] = useState([]); // Store all for subcategory lookup
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [openCategoryId, setOpenCategoryId] = useState(null);
 
   useEffect(() => {
-    // Obtener categorías principales (que son parent de otras categorías)
-    const allParentIds = new Set(
-      categoriesData
-        .filter((cat) => cat.parentCategory)
-        .map((cat) => cat.parentCategory._id)
-    );
+    const loadCategories = async () => {
+      const data = await fetchCategories();
+      setAllCategories(data);
 
-    // Filtrar categorías que son padres o que no tienen parent
-    const mainCategories = categoriesData.filter(
-      (cat) => !cat.parentCategory || allParentIds.has(cat._id)
-    );
+      // Obtener categorías principales (que no tienen parentCategory)
+      const mainCategories = data.filter((cat) => !cat.parentCategory);
+      setCategories(mainCategories);
+    };
 
-    setCategories(mainCategories);
+    loadCategories();
   }, []);
 
   // Función para obtener subcategorías de una categoría principal
   const getSubcategories = (parentId) => {
-    const subcategories = categoriesData.filter(
-      (cat) => cat.parentCategory && cat.parentCategory._id === parentId
+    const subcategories = allCategories.filter(
+      (cat) => cat.parentCategory && (cat.parentCategory._id === parentId || cat.parentCategory === parentId)
     );
     return subcategories.sort((a, b) => a.name.localeCompare(b.name));
   };
+
 
   // Si es versión móvil, renderizar solo los enlaces principales
   if (isMobile) {
@@ -96,64 +96,64 @@ const Navigation = ({ isMobile = false, onLinkClick }) => {
               <Icon name="chevronDown" size={14} />
             </button>
 
-{isDropdownOpen && (
-  <div className="categories-dropdown-menu">
-    {categories.map((category) => {
-      const subcategories = getSubcategories(category._id);
-      const isOpen = openCategoryId === category._id;
+            {isDropdownOpen && (
+              <div className="categories-dropdown-menu">
+                {categories.map((category) => {
+                  const subcategories = getSubcategories(category._id);
+                  const isOpen = openCategoryId === category._id;
 
-      return (
-        <div key={category._id} className="category-group">
+                  return (
+                    <div key={category._id} className="category-group">
 
-          <div className="category-header">
+                      <div className="category-header">
 
-            {/* Link de la categoría (NO despliega subcategorías) */}
-            <Link
-              to={`/category/${category._id}`}
-              className="category-link main-category"
-            >
-              {category.name}
-            </Link>
+                        {/* Link de la categoría (NO despliega subcategorías) */}
+                        <Link
+                          to={`/category/${category._id}`}
+                          className="category-link main-category"
+                        >
+                          {category.name}
+                        </Link>
 
-            {/* Flecha para abrir/cerrar subcategorías */}
-            {subcategories.length > 0 && (
-              <button
-                className="toggle-subcats-btn"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setOpenCategoryId(isOpen ? null : category._id);
-                }}
-              >
-                <Icon
-                  name={isOpen ? "chevronDown" : "chevronRight"}
-                  size={12}
-                />
-              </button>
+                        {/* Flecha para abrir/cerrar subcategorías */}
+                        {subcategories.length > 0 && (
+                          <button
+                            className="toggle-subcats-btn"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setOpenCategoryId(isOpen ? null : category._id);
+                            }}
+                          >
+                            <Icon
+                              name={isOpen ? "chevronDown" : "chevronRight"}
+                              size={12}
+                            />
+                          </button>
+                        )}
+
+                      </div>
+
+                      {/* Subcategorías (solo visibles si se abre con la flecha) */}
+                      {isOpen && subcategories.length > 0 && (
+                        <div className="subcategories">
+                          {subcategories.map((subcat) => (
+                            <Link
+                              key={subcat._id}
+                              to={`/category/${subcat._id}`}
+                              className="category-link sub-category"
+                            >
+                              {subcat.name}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+
+                    </div>
+                  );
+                })}
+              </div>
             )}
-
-          </div>
-
-          {/* Subcategorías (solo visibles si se abre con la flecha) */}
-          {isOpen && subcategories.length > 0 && (
-            <div className="subcategories">
-              {subcategories.map((subcat) => (
-                <Link
-                  key={subcat._id}
-                  to={`/category/${subcat._id}`}
-                  className="category-link sub-category"
-                >
-                  {subcat.name}
-                </Link>
-              ))}
-            </div>
-          )}
-
-        </div>
-      );
-    })}
-  </div>
-)}
 
           </div>
 

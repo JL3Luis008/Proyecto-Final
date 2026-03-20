@@ -52,7 +52,6 @@ router.post(
   "/orders",
   authMiddleware,
   [
-    bodyMongoIdValidation("user", "User"),
     body("products")
       .notEmpty()
       .withMessage("Products are required")

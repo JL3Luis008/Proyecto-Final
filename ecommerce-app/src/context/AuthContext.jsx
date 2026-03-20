@@ -2,8 +2,14 @@ import { createContext, useContext, useEffect, useState } from "react";
 import {
   login as loginService,
   register as registerService,
+  logout as logoutService,
 } from "../services/auth";
-import { getUserProfile } from "../services/userService";
+import {
+  getUserProfile,
+  updateUserProfile as updateUserProfileService,
+  changePassword as changePasswordService,
+  uploadUserProfileImage as uploadAvatarService,
+} from "../services/userService";
 import { setLogoutCallback } from "../services/http";
 
 const AuthContext = createContext(null);
@@ -132,10 +138,53 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    // Notify the backend to revoke tokens
+    await logoutService();
+    // Then clear local state
     removeToken();
     setUser(null);
     setIsAuth(false);
+  };
+
+  const updateProfile = async (userData) => {
+    try {
+      const updatedUser = await updateUserProfileService(userData);
+      if (updatedUser) {
+        setUser(updatedUser);
+        saveUserData(updatedUser);
+        return { success: true, user: updatedUser };
+      }
+      return { success: false, error: "No se pudo actualizar el perfil" };
+    } catch (error) {
+      console.error("Error updating profile in context", error);
+      return { success: false, error: error.response?.data?.message || "Error al actualizar perfil" };
+    }
+  };
+
+  const updatePassword = async (passwordData) => {
+    try {
+      const result = await changePasswordService(passwordData);
+      return { success: true, message: result.message };
+    } catch (error) {
+      console.error("Error changing password in context", error);
+      return { success: false, error: error.response?.data?.message || "Error al cambiar contraseña" };
+    }
+  };
+
+  const uploadAvatar = async (file) => {
+    try {
+      const result = await uploadAvatarService(file);
+      if (result && result.imageUrl) {
+        // We don't necessarily update the user profile in DB yet, 
+        // but we return the URL so the component can call updateProfile.
+        return { success: true, imageUrl: result.imageUrl };
+      }
+      return { success: false, error: "Error al subir la imagen" };
+    } catch (error) {
+      console.error("Error uploading avatar in context", error);
+      return { success: false, error: error.response?.data?.message || "Error al subir imagen" };
+    }
   };
 
   const hasRole = (role) => {
@@ -151,6 +200,9 @@ export function AuthProvider({ children }) {
     logout,
     hasRole,
     getToken,
+    updateProfile,
+    updatePassword,
+    uploadAvatar,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

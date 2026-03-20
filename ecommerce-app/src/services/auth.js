@@ -74,3 +74,15 @@ export const checkEmail = async (email) => {
     return null;
   }
 };
+
+export const logout = async () => {
+  try {
+    const refreshToken = localStorage.getItem("refreshToken");
+    // Even if no refresh token, we still want to call logout to revoke the access token in headers
+    await http.post("auth/logout", { refreshToken });
+    return true;
+  } catch (error) {
+    console.error("Error al desconectar sesión en backend", error);
+    return false;
+  }
+};

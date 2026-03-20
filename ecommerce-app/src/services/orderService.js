@@ -1,12 +1,8 @@
 import { http } from "./http";
 
-export const createOrder = (async) => async (orderData) => {
-  try {
-    const response = await http.post("orders", orderData);
-    return response.data;
-  } catch (error) {
-    console.error(error);
-  }
+export const createOrder = async (orderData) => {
+  const response = await http.post("orders", orderData);
+  return response.data;
 };
 
 export const getMyOrders = async (page = 1, limit = 10) => {

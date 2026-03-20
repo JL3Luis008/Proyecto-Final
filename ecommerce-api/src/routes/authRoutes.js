@@ -5,7 +5,9 @@ import {
   login,
   register,
   refreshToken,
+  logout
 } from "../controllers/authController.js";
+import authMiddleware from "../middlewares/authMiddleware.js";
 import validate from "../middlewares/validation.js";
 import { authLimiter } from "../middlewares/rateLimiter.js";
 import {
@@ -48,5 +50,7 @@ router.post(
 router.post("/refresh", refreshToken);
 
 router.get("/check-email", [queryEmailValidation()], validate, checkEmail);
+
+router.post("/logout", authMiddleware, logout);
 
 export default router;

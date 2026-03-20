@@ -1,6 +1,9 @@
 import { Navigate, useLocation } from "react-router-dom";
-import Loading from "../components/common/Loading/Loading";
+import { Loading } from "../components/atoms";
+
 import { useAuth } from "../context/AuthContext";
+
+import "./ProtectedRoute.css";
 
 export default function ProtectedRoute({
   children,
@@ -17,7 +20,7 @@ export default function ProtectedRoute({
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
     return (
-      <div style={{ textAlign: "center", padding: "48px" }}>
+      <div className="protected-route-error">
         <h2>Acceso denegado</h2>
         <p>No tienes permisos para acceder a esta página.</p>
       </div>
@@ -73,7 +76,7 @@ export default function ProtectedRoute({
 
   if (allowedRoles && user && !allowedRoles.includes(user.role)) {
     return (
-      <div style={{ textAlign: "center", padding: "48px" }}>
+      <div className="protected-route-error">
         <h2>Acceso denegado</h2>
         <p>No tienes permisos para acceder a esta página.</p>
       </div>

@@ -1,4 +1,5 @@
-import ProfileCard from "../components/ProfileCard/ProfileCard";
+import { ProfileCard } from "../components/molecules";
+
 
 export default function Profile() {
   return <ProfileCard />;

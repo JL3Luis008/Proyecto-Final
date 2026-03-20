@@ -92,14 +92,9 @@ const updateReview = async (req, res, next) => {
       });
     }
 
-    const review = await Review.findById(reviewId);
+    const review = await Review.findOne({ _id: reviewId, user: userId });
     if (!review) {
-      return res.status(404).json({ message: "Review not found" });
-    }
-
-    // Verificar que el usuario es el propietario de la review
-    if (review.user.toString() !== userId) {
-      return res.status(403).json({ message: "You can only update your own reviews" });
+      return res.status(404).json({ message: "Review not found or unauthorized" });
     }
 
     // Actualizar solo los campos proporcionados
@@ -124,14 +119,9 @@ const deleteReview = async (req, res, next) => {
     const { reviewId } = req.params;
     const userId = req.user.userId;
 
-    const review = await Review.findById(reviewId);
+    const review = await Review.findOne({ _id: reviewId, user: userId });
     if (!review) {
-      return res.status(404).json({ message: "Review not found" });
-    }
-
-    // Verificar que el usuario es el propietario de la review
-    if (review.user.toString() !== userId) {
-      return res.status(403).json({ message: "You can only delete your own reviews" });
+      return res.status(404).json({ message: "Review not found or unauthorized" });
     }
 
     await Review.findByIdAndDelete(reviewId);

@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import User from "../models/user.js";
+import RevokedToken from "../models/revokedToken.js";
 
 const generateToken = (userId, displayName, role) => {
   return jwt.sign({ userId, displayName, role }, process.env.JWT_SECRET, {
@@ -132,4 +133,50 @@ async function refreshToken(req, res, next) {
   }
 }
 
-export { checkEmail, login, register, refreshToken };
+// Extract expiration from a JWT string safely
+const getExpiryDate = (tokenString) => {
+  try {
+    const decoded = jwt.decode(tokenString);
+    if (decoded && decoded.exp) {
+      return new Date(decoded.exp * 1000);
+    }
+  } catch (error) {
+    // Return a default short expiry if token is unparseable
+  }
+  return new Date(Date.now() + 24 * 60 * 60 * 1000); // 1 day fallback
+};
+
+async function logout(req, res, next) {
+  try {
+    const accessToken = req.headers["authorization"]?.split(" ")[1];
+    const { refreshToken } = req.body;
+
+    // Si tenemos el access token, lo agregamos a la lista negra
+    if (accessToken) {
+      await RevokedToken.create({
+        token: accessToken,
+        expiresAt: getExpiryDate(accessToken),
+        user: req.user?.userId || null
+      });
+    }
+
+    // Si tenemos el refresh token, lo invalidamos también (más importante porque dura 7 días)
+    if (refreshToken) {
+      await RevokedToken.create({
+        token: refreshToken,
+        expiresAt: getExpiryDate(refreshToken),
+        user: req.user?.userId || null
+      });
+    }
+
+    res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    if (error.code === 11000) {
+      // Ignore duplicate key errors if the token was already revoked
+      return res.status(200).json({ message: "Logout successful" });
+    }
+    next(error);
+  }
+}
+
+export { checkEmail, login, register, refreshToken, logout };
