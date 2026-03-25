@@ -10,6 +10,10 @@ export default function AdminProductForm({ product, onClose, onSuccess }) {
     const [formData, setFormData] = useState({
         name: product?.name || "",
         description: product?.description || "",
+        details: product?.details || "",
+        includes: product?.includes || "",
+        condition: product?.condition || "New",
+        region: product?.region || "",
         company: product?.company || "",
         price: product?.price || "",
         stock: product?.stock || "",
@@ -165,15 +169,61 @@ export default function AdminProductForm({ product, onClose, onSuccess }) {
                     onChange={handleChange}
                     required
                 />
+
+                <Input
+                    label="Región"
+                    name="region"
+                    value={formData.region}
+                    onChange={handleChange}
+                    required
+                />
+
+                <div className="input-group">
+                    <label className="input-label">Condición</label>
+                    <select
+                        name="condition"
+                        value={formData.condition}
+                        onChange={handleChange}
+                        className="input-field"
+                        required
+                    >
+                        <option value="New">Nuevo</option>
+                        <option value="Used">Usado</option>
+                        <option value="Refurbished">Reacondicionado</option>
+                        <option value="Open Box">Caja Abierta</option>
+                    </select>
+                </div>
+            </div>
+
+            <div className="form-grid">
+                <Input
+                    label="¿Qué incluye?"
+                    name="includes"
+                    value={formData.includes}
+                    onChange={handleChange}
+                    placeholder="Ej: Cable USB, Manual, Estuche"
+                    required
+                />
             </div>
 
             <div className="form-group">
-                <label className="input-label">Descripción</label>
+                <label className="input-label">Descripción Corta</label>
                 <textarea
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
                     className="input-field textarea"
+                    required
+                ></textarea>
+            </div>
+
+            <div className="form-group">
+                <label className="input-label">Detalles del Producto (Full Specs)</label>
+                <textarea
+                    name="details"
+                    value={formData.details}
+                    onChange={handleChange}
+                    className="input-field textarea-large"
                     required
                 ></textarea>
             </div>

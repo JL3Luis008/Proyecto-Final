@@ -86,3 +86,23 @@ export const uploadProductImage = async (file) => {
   }
 };
 
+export const getProductReviews = async (productId) => {
+  try {
+    const response = await http.get(`products/${productId}/reviews`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+    return [];
+  }
+};
+
+export const addProductReview = async (productId, reviewData) => {
+  try {
+    const response = await http.post(`products/${productId}/reviews`, reviewData);
+    return response.data;
+  } catch (error) {
+    console.error("Error adding review:", error);
+    throw error;
+  }
+};
+

@@ -507,12 +507,12 @@ export default function Checkout() {
                   // The backend expects products array with required fields and shipping/payment ObjectIds.
                   const payload = {
                     products: cartItems.map((item) => ({
-                      product: item.productId || item._id, // Adapt if needed
+                      productId: item.productId || item._id, // Use productId as expected by backend
                       quantity: item.quantity,
                       price: item.price
                     })),
-                    shippingAddress: selectedAddress.id, // Usually _id mapped to id by our helpers
-                    paymentMethod: selectedPayment.id,
+                    shippingAddress: selectedAddress.id || selectedAddress._id,
+                    paymentMethod: selectedPayment.id || selectedPayment._id,
                   };
 
                   const confirmedOrder = await createOrder(payload);

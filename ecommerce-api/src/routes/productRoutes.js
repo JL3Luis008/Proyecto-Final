@@ -9,6 +9,7 @@ import {
   updateProduct,
   uploadProductImage,
 } from "../controllers/productController.js";
+import { addProductReview, getProductReviews } from "../controllers/reviewController.js";
 import authMiddleware from "../middlewares/authMiddleware.js";
 import isAdmin from "../middlewares/isAdminMiddleware.js";
 import validate from "../middlewares/validation.js";
@@ -23,13 +24,19 @@ import {
   priceValidation,
   productDescriptionValidation,
   productNameValidation,
+  productDetailsValidation,
+  productIncludesValidation,
+  productConditionValidation,
+  productRegionValidation,
   queryBooleanValidation,
   queryMongoIdValidation,
   queryPriceValidation,
   searchQueryValidation,
   sortFieldValidation,
   stockOptionalValidation,
-  stockValidation
+  stockValidation,
+  ratingValidation,
+  commentValidation
 } from "../middlewares/validators.js";
 
 const router = express.Router();
@@ -69,6 +76,10 @@ router.post(
   [
     productNameValidation(true),
     productDescriptionValidation(true),
+    productDetailsValidation(true),
+    productIncludesValidation(true),
+    productConditionValidation(true),
+    productRegionValidation(true),
     priceValidation("price"),
     stockValidation(),
     ...imagesUrlValidation(true),
@@ -86,6 +97,10 @@ router.put(
     mongoIdValidation("id", "Product ID"),
     productNameValidation(false),
     productDescriptionValidation(false),
+    productDetailsValidation(false),
+    productIncludesValidation(false),
+    productConditionValidation(false),
+    productRegionValidation(false),
     priceOptionalValidation("price"),
     stockOptionalValidation(),
     ...imagesUrlValidation(false),
@@ -112,5 +127,26 @@ router.post(
   upload.single('image'),
   uploadProductImage
 );
+
+// Reseñas
+router.get(
+  "/products/:id/reviews",
+  [mongoIdValidation("id", "Product ID")],
+  validate,
+  getProductReviews
+);
+
+router.post(
+  "/products/:id/reviews",
+  authMiddleware,
+  [
+    mongoIdValidation("id", "Product ID"),
+    ratingValidation(),
+    commentValidation()
+  ],
+  validate,
+  addProductReview
+);
+
 
 export default router;

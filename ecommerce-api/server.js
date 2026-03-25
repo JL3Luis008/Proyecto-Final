@@ -26,7 +26,7 @@ if (process.env.NODE_ENV !== "test") {
 
 app.use(express.json());
 app.use(logger);
-app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use(cors({ origin: process.env.CORS_ORIGIN ? process.env.CORS_ORIGIN.split(',') : 'http://localhost:3000', credentials: true }));
 
 // Serve static files from the uploads directory
 app.use('/uploads', express.static(path.join(__dirname, 'src/uploads')));

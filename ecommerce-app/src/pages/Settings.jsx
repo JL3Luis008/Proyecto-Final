@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { getProductImageUrl } from "../utils/imageUtils";
 import { Button, Input, Loading, ErrorMessage } from "../components/atoms";
 import "./Settings.css";
 
 export default function Settings() {
+    const navigate = useNavigate();
     const { user, updateProfile, updatePassword, uploadAvatar, loading } = useAuth();
 
     // Tab state
@@ -11,8 +14,7 @@ export default function Settings() {
 
     // Profile Form State
     const [profileData, setProfileData] = useState({
-        firstName: "",
-        lastName: "",
+        displayName: "",
         phone: "",
     });
     const [profileStatus, setProfileStatus] = useState({ loading: false, error: null, success: false });
@@ -32,8 +34,7 @@ export default function Settings() {
     useEffect(() => {
         if (user) {
             setProfileData({
-                firstName: user.firstName || "",
-                lastName: user.lastName || "",
+                displayName: user.displayName || user.name || "",
                 phone: user.phone || "",
             });
         }
@@ -61,6 +62,10 @@ export default function Settings() {
 
         if (result.success) {
             setProfileStatus({ loading: false, error: null, success: true });
+            // Redirect after a short delay to show success
+            setTimeout(() => {
+                navigate("/profile");
+            }, 1500);
         } else {
             setProfileStatus({ loading: false, error: result.error, success: false });
         }
@@ -103,10 +108,9 @@ export default function Settings() {
         const result = await uploadAvatar(file);
 
         if (result.success) {
-            // Backend automatically updates DB, but we need to refresh context if needed,
-            // or we just rely on the API returning the new URL.
-            // Usually calling an empty updateProfile re-fetches or we need a local patch.
-            await updateProfile({ ...profileData });
+            // Update profile with the new avatar URL
+            const finalData = { ...profileData, avatar: result.imageUrl };
+            await updateProfile(finalData);
             setAvatarStatus({ loading: false, error: null, success: true });
         } else {
             setAvatarStatus({ loading: false, error: result.error, success: false });
@@ -160,7 +164,7 @@ export default function Settings() {
                             <div className="avatar-section">
                                 <div className="avatar-wrapper">
                                     <img
-                                        src={user.avatar || "https://api.dicebear.com/7.x/avataaars/svg?seed=" + user._id}
+                                        src={getProductImageUrl(user.avatar) || "https://api.dicebear.com/7.x/avataaars/svg?seed=" + user._id}
                                         alt="Perfil"
                                         className="avatar-image"
                                     />
@@ -184,18 +188,11 @@ export default function Settings() {
                             </div>
 
                             <form onSubmit={onProfileSubmit} className="settings-form">
-                                <div className="form-group-row">
+                                <div className="form-group-single">
                                     <Input
-                                        label="Nombre"
-                                        name="firstName"
-                                        value={profileData.firstName}
-                                        onChange={handleProfileChange}
-                                        required
-                                    />
-                                    <Input
-                                        label="Apellidos"
-                                        name="lastName"
-                                        value={profileData.lastName}
+                                        label="Nombre Completo / Nombre a mostrar"
+                                        name="displayName"
+                                        value={profileData.displayName}
                                         onChange={handleProfileChange}
                                         required
                                     />

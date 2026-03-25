@@ -1,5 +1,6 @@
 import { useCart } from "../../../context/CartContext";
 import { Button, Icon } from "../../atoms";
+import { getProductImageUrl } from "../../../utils/imageUtils";
 
 
 export default function CartView() {
@@ -19,9 +20,12 @@ export default function CartView() {
         <div className="cart-item" key={item._id}>
           <div className="cart-item-image">
             <img
-              src={item.imagesUrl?.[0] || "/img/products/placeholder.svg"}
+              src={getProductImageUrl(item.imagesUrl?.[0])}
               alt={item.name}
               loading="lazy"
+              onError={(e) => {
+                e.target.src = "/img/products/placeholder.svg";
+              }}
             />
           </div>
 

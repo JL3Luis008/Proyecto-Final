@@ -5,16 +5,20 @@ export const createOrder = async (orderData) => {
   return response.data;
 };
 
-export const getMyOrders = async (page = 1, limit = 10) => {
+/**
+ * Obtener las órdenes del usuario autenticado.
+ * GET /api/orders/me
+ * @param {number} page - Número de página (default: 1)
+ * @param {number} limit - Resultados por página (default: 20)
+ * @returns {{ orders: Order[], pagination: { total, page, limit, totalPages } }}
+ */
+export const getMyOrders = async (page = 1, limit = 20) => {
   try {
-    //miapi/orders/my-orders/1/10
-    //miapi/orders/my-orders?page=1&limit=10
-    const response = await http.get("orders/my-orders", {
-      params: { page, limit },
-    });
+    const response = await http.get("orders/me", { params: { page, limit } });
     return response.data;
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching my orders:", error);
+    return { orders: [], pagination: {} };
   }
 };
 
@@ -23,6 +27,7 @@ export const getOrderById = async (orderId) => {
     const response = await http.get(`orders/${orderId}`);
     return response.data;
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching order by ID:", error);
+    return null;
   }
 };

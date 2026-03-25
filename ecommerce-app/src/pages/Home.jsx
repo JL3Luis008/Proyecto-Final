@@ -1,6 +1,6 @@
 
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { BannerCarousel, List } from "../components/organisms";
 import { ErrorMessage, Loading, Button } from "../components/atoms";
 import { Pagination } from "../components/molecules";
@@ -52,10 +52,10 @@ export default function Home() {
     loadProducts();
   }, [page, limit]);
 
-  const handlePageChange = (newPage) => {
+  const handlePageChange = useCallback((newPage) => {
     setPage(newPage);
     window.scrollTo({ top: 0, behavior: "smooth" });
-  };
+  }, []);
 
   const toggleDisplay = () => {
     display === "grid" ? setDisplay("list-vertical") : setDisplay("grid");

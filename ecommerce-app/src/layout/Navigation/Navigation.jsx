@@ -26,41 +26,51 @@ const Navigation = ({ isMobile = false, onLinkClick }) => {
 
   // Función para obtener subcategorías de una categoría principal
   const getSubcategories = (parentId) => {
-    const subcategories = allCategories.filter(
+    const subcats = allCategories.filter(
       (cat) => cat.parentCategory && (cat.parentCategory._id === parentId || cat.parentCategory === parentId)
     );
-    return subcategories.sort((a, b) => a.name.localeCompare(b.name));
+    return subcats.sort((a, b) => a.name.localeCompare(b.name));
   };
+
+  // Helper to find category by name or approximate name
+  const findCategory = (name) => {
+    return allCategories.find(c => 
+      c.name.toLowerCase().includes(name.toLowerCase()) || 
+      (c.description && c.description.toLowerCase().includes(name.toLowerCase()))
+    );
+  };
+
+  const videogameCat = findCategory("Juegos de video") || findCategory("Videojuegos");
+  const consolesCat = findCategory("Consolas");
+
+  // Define key brands for main navigation
+  const mainBrands = ["Nintendo", "Sony Playstation", "Xbox", "Sega"];
 
 
   // Si es versión móvil, renderizar solo los enlaces principales
   if (isMobile) {
     return (
       <div className="mobile-navigation">
-        {/* Ofertas especiales */}
+        {/* Marcas principales */}
+        {mainBrands.map(brand => (
+          <Link
+            key={brand}
+            to={`/search?company=${encodeURIComponent(brand)}`}
+            className="mobile-nav-link special"
+            onClick={onLinkClick}
+          >
+            <Icon name="tag" size={20} />
+            {brand}
+          </Link>
+        ))}
+        
         <Link
-          to="/videogames"
-          className="mobile-nav-link special"
-          onClick={onLinkClick}
-        >
-          <Icon name="tag" size={20} />
-          Videojuegos
-        </Link>
-        <Link
-          to="/consoles"
-          className="mobile-nav-link special"
-          onClick={onLinkClick}
-        >
-          <Icon name="sparkles" size={20} />
-          Consolas
-        </Link>
-        <Link
-          to="/more"
+          to="/search?sort=rating&order=desc"
           className="mobile-nav-link special"
           onClick={onLinkClick}
         >
           <Icon name="star" size={20} />
-          Más...
+          Más vendidos
         </Link>
 
 
@@ -111,6 +121,7 @@ const Navigation = ({ isMobile = false, onLinkClick }) => {
                         <Link
                           to={`/category/${category._id}`}
                           className="category-link main-category"
+                          onClick={() => setIsDropdownOpen(false)}
                         >
                           {category.name}
                         </Link>
@@ -138,10 +149,11 @@ const Navigation = ({ isMobile = false, onLinkClick }) => {
                       {isOpen && subcategories.length > 0 && (
                         <div className="subcategories">
                           {subcategories.map((subcat) => (
-                            <Link
+                             <Link
                               key={subcat._id}
                               to={`/category/${subcat._id}`}
                               className="category-link sub-category"
+                              onClick={() => setIsDropdownOpen(false)}
                             >
                               {subcat.name}
                             </Link>
@@ -159,13 +171,16 @@ const Navigation = ({ isMobile = false, onLinkClick }) => {
 
           {/* Navegación horizontal */}
           <nav className="categories-nav">
-            <Link to="/offers" className="nav-link special">
-              Videojuegos
-            </Link>
-            <Link to="/new" className="nav-link special">
-              Consolas
-            </Link>
-            <Link to="/bestsellers" className="nav-link special">
+            {mainBrands.map(brand => (
+               <Link 
+                 key={brand}
+                 to={`/search?company=${encodeURIComponent(brand)}`} 
+                 className="nav-link special"
+               >
+                 {brand}
+               </Link>
+            ))}
+            <Link to="/search?sort=rating&order=desc" className="nav-link special">
               Más vendidos
             </Link>
           </nav>

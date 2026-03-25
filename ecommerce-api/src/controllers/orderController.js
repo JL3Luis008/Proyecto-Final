@@ -66,6 +66,40 @@ async function getOrdersByUser(req, res, next) {
   }
 }
 
+// GET /orders/me — devuelve las órdenes del usuario autenticado (sin userId en la URL)
+async function getMyOrders(req, res, next) {
+  try {
+    const userId = req.user.userId;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    const [orders, total] = await Promise.all([
+      Order.find({ user: userId })
+        .populate("user", "displayName email")
+        .populate("products.productId")
+        .populate("shippingAddress")
+        .populate("paymentMethod")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Order.countDocuments({ user: userId }),
+    ]);
+
+    res.json({
+      orders,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function createOrder(req, res, next) {
   try {
     const userId = req.user.userId;
@@ -74,13 +108,14 @@ async function createOrder(req, res, next) {
     // Verificar stock de todos los productos ANTES de crear la orden
     const stockChecks = await Promise.all(
       products.map(async (item) => {
-        const product = await Product.findById(item.productId);
+        const idToFind = item.productId || item.product;
+        const product = await Product.findById(idToFind);
         if (!product) {
-          return { productId: item.productId, error: "Product not found" };
+          return { productId: idToFind, error: "Product not found" };
         }
         if (product.stock < item.quantity) {
           return {
-            productId: item.productId,
+            productId: idToFind,
             productName: product.name,
             error: `Insufficient stock. Available: ${product.stock}, Requested: ${item.quantity}`,
             available: product.stock,
@@ -353,6 +388,7 @@ export {
   getOrderById,
   getOrders,
   getOrdersByUser,
+  getMyOrders,
   updateOrder,
   updateOrderStatus,
   updatePaymentStatus

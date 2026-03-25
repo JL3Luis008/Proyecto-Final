@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import ProductDetailsCard from "../components/ProductDetails/ProductDetailsCard";
+import ProductDetailsComponent from "../components/organisms/ProductDetails/ProductDetails";
 
 export default function ProductDetails() {
   const { productId } = useParams();
@@ -9,5 +9,5 @@ export default function ProductDetails() {
       <div className="search-results-message">ID de producto inválido.</div>
     );
   }
-  return <ProductDetailsCard productId={productId} />;
+  return <ProductDetailsComponent productId={productId} />;
 }

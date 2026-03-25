@@ -1,46 +1,24 @@
 [
   {
-    "_id": "67fc9bda370302bf46079350",
-    "displayName": "Admin User",
-    "email": "admin@email.com",
-    "role": "admin",
-    "avatar": "https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/male/512/80.jpg",
-    "isActive": true
-  }
+  "_id": "699bdb4a4301711b9e006674",
+  "displayName": "Adriana Villalpando",
+  "email": "adriana1309@inadaptados.mx",
+  "hashPassword": "$2b$10$dTCyQyFOsBLJcMSdgNicneEGY9mYPVATWFSdBYW0/sZl5neT7zfuW",
+  "role": "guest",
+  "avatar": "https://placehold.co/100x100.png",
+  "isActive": true,
+  "__v": 0
+}
   ,
   {
-    "_id": "67fc9bda370302bf46079351",
-    "displayName": "BoxtoPlay",
-    "email": "boxtoPlay@email.com",
-    "role": "supplier",
-    "avatar": "https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/male/512/80.jpg",
-    "isActive": true
-  }
-  ,
-  {
-    "_id": "67fc9bda370302bf46079352",
-    "displayName": "jose Lara",
-    "email": "joseLL@email.com",
-    "role": "customer",
-    "avatar": "https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/male/512/80.jpg",
-    "isActive": true
-  }
-  ,
-  {
-    "_id": "67fc9bda370302bf46079353",
-    "displayName": "Sebastian Villalpando",
-    "email": "SebasLV@email.com",
-    "role": "customer",
-    "avatar": "https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/male/512/88.jpg",
-    "isActive": true
-  }
-  ,
-  {
-    "_id": "67fc9bda370302bf46079353",
-    "displayName": "Adriana Reyes",
-    "email": "AdrisR3@email.com",
-    "role": "customer",
-    "avatar": "https://cdn.jsdelivr.net/gh/faker-js/assets-person-portrait/male/512/88.jpg",
-    "isActive": true
-  }
+  "_id": "699be06718dba31d0937cf64",
+  "displayName": "Jose Luis Lozano",
+  "email": "josejl3@inadaptados.mx",
+  "hashPassword": "$2b$10$8GO/jyMVv0m9TJu1Zn2uZ.rTB3wGxZLTfNyNq1tQvtiRhO9oLX35S",
+  "role": "admin",
+  "avatar": "/uploads/avatars/1773193056594-878431809.jpg",
+  "isActive": true,
+  "__v": 0,
+  "phone": "4491893134"
+}
 ]

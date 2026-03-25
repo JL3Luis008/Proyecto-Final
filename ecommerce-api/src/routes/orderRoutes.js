@@ -7,6 +7,7 @@ import {
   getOrderById,
   getOrders,
   getOrdersByUser,
+  getMyOrders,
   updateOrder,
   updateOrderStatus,
   updatePaymentStatus,
@@ -28,6 +29,10 @@ const router = express.Router();
 
 // Obtener todas las órdenes (admin)
 router.get("/orders", authMiddleware, isAdmin, getOrders);
+
+// Obtener órdenes del usuario autenticado (sin userId en la URL)
+// IMPORTANTE: Esta ruta debe estar ANTES de /orders/:id para evitar conflicto
+router.get("/orders/me", authMiddleware, getMyOrders);
 
 // Obtener órdenes por usuario
 router.get(

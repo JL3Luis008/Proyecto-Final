@@ -23,6 +23,11 @@
     resize: vertical;
 }
 
+.textarea-large {
+    min-height: 200px;
+    resize: vertical;
+}
+
 .image-preview-container {
     display: flex;
     gap: 1rem;

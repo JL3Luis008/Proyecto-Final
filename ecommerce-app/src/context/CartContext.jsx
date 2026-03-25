@@ -28,7 +28,7 @@ export function CartProvider({ children }) {
   const getTotalPrice = () =>
     state.items.reduce((sum, i) => sum + i.price * i.quantity, 0);
 
-  // Actualizar localStorage cuando cambie el carrito
+  // Persistir carrito en localStorage como caché secundario
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(state.items));
   }, [state.items]);
@@ -37,18 +37,77 @@ export function CartProvider({ children }) {
     const initializeCart = async () => {
       if (isAuth && user?._id) {
         try {
-          const backendCart = await cartService.getCart(user._id);
-          if (backendCart?.cart?.products) {
-            dispatch({ type: CART_ACTIONS.INIT, payload: backendCart.cart.products });
+          // 1. Leer items locales ANTES de sobrescribirlos con el BE
+          const localRaw = localStorage.getItem("cart");
+          const localItems = localRaw ? JSON.parse(localRaw) : [];
+
+          // 2. Obtener carrito del backend
+          const backendCart = await cartService.getCart();
+          const backendProducts = backendCart?.cart?.products || [];
+
+          if (backendProducts.length === 0 && localItems.length === 0) {
+            // Carrito vacío en ambos lados
+            dispatch({ type: CART_ACTIONS.INIT, payload: [] });
+            return;
+          }
+
+          // 3. Merge: BE es fuente de verdad para existentes; items locales únicos se añaden
+          const backendIds = new Set(
+            backendProducts.map((p) => {
+              const id = p.product?._id || p.product || p._id;
+              return id?.toString();
+            })
+          );
+
+          // Items locales que NO están en el BE (genuinamente nuevos, añadidos sin sesión)
+          const uniqueLocalItems = localItems.filter((localItem) => {
+            const localId = (localItem._id || localItem.productId || localItem.id)?.toString();
+            return localId && !backendIds.has(localId);
+          });
+
+          // 4. Inicializar el estado con productos del BE
+          dispatch({ type: CART_ACTIONS.INIT, payload: backendProducts });
+
+          // 5. Sincronizar items locales únicos al BE y al estado
+          if (uniqueLocalItems.length > 0) {
+            for (const item of uniqueLocalItems) {
+              const productId = item._id || item.productId || item.id;
+              const quantity = item.quantity || 1;
+              if (productId) {
+                dispatch({
+                  type: CART_ACTIONS.ADD,
+                  payload: { ...item, quantity },
+                });
+                // Sincronizar con BE de forma silenciosa (fire and forget)
+                cartService
+                  .addToCart(user._id, productId, quantity)
+                  .catch((err) =>
+                    console.warn("No se pudo sincronizar item local al BE:", err)
+                  );
+              }
+            }
           }
         } catch (error) {
-          console.error(error);
+          console.error("Error al inicializar carrito:", error);
+        }
+      } else if (!isAuth) {
+        // Usuario desautenticado: cargar desde localStorage si hay algo
+        const localRaw = localStorage.getItem("cart");
+        if (localRaw) {
+          try {
+            const localItems = JSON.parse(localRaw);
+            if (Array.isArray(localItems) && localItems.length > 0) {
+              dispatch({ type: CART_ACTIONS.INIT, payload: localItems });
+            }
+          } catch {
+            // localStorage corrupted, ignorar
+          }
         }
       }
     };
 
     initializeCart();
-  }, [isAuth]);
+  }, [isAuth, user?._id]);
 
   const syncToBackend = async (syncFn) => {
     if (!isAuth) return;
