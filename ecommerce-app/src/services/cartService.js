@@ -1,8 +1,12 @@
 import { http } from "./http";
 
-export const getCart = async (userId) => {
+/**
+ * Obtener el carrito del usuario autenticado.
+ * GET /api/cart/my-cart (usa JWT del header, sin userId en la URL)
+ */
+export const getCart = async () => {
   try {
-    const response = await http.get(`cart/user/${userId}`);
+    const response = await http.get("cart/my-cart");
     return response.data;
   } catch (error) {
     console.error("Error fetching a cart", error);

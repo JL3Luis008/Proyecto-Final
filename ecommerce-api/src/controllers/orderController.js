@@ -66,6 +66,40 @@ async function getOrdersByUser(req, res, next) {
   }
 }
 
+// GET /orders/me — devuelve las órdenes del usuario autenticado (sin userId en la URL)
+async function getMyOrders(req, res, next) {
+  try {
+    const userId = req.user.userId;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 20;
+    const skip = (page - 1) * limit;
+
+    const [orders, total] = await Promise.all([
+      Order.find({ user: userId })
+        .populate("user", "displayName email")
+        .populate("products.productId")
+        .populate("shippingAddress")
+        .populate("paymentMethod")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit),
+      Order.countDocuments({ user: userId }),
+    ]);
+
+    res.json({
+      orders,
+      pagination: {
+        total,
+        page,
+        limit,
+        totalPages: Math.ceil(total / limit),
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function createOrder(req, res, next) {
   try {
     const userId = req.user.userId;
@@ -354,6 +388,7 @@ export {
   getOrderById,
   getOrders,
   getOrdersByUser,
+  getMyOrders,
   updateOrder,
   updateOrderStatus,
   updatePaymentStatus
