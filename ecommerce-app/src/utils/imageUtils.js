@@ -6,7 +6,7 @@
  * @returns {string} - The formatted URL
  */
 export const getProductImageUrl = (url) => {
-    if (!url) return '/img/products/placeholder.svg';
+    if (!url) return null;
 
     if (url.startsWith('http')) {
         return url;
@@ -15,6 +15,7 @@ export const getProductImageUrl = (url) => {
     // Clean potential double slashes
     const cleanUrl = url.startsWith('/') ? url : `/${url}`;
 
-    // Use port 4000 as per user configuration
-    return `http://localhost:4000${cleanUrl}`;
+    // Use server URL from env variables
+    const serverUrl = process.env.REACT_APP_SERVER_URL || 'http://localhost:4000';
+    return `${serverUrl}${cleanUrl}`;
 };

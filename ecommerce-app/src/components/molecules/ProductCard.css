@@ -81,7 +81,35 @@
 }
 
 .product-card-title a:hover {
-  color: var(--primary);
+    color: var(--primary-color, #2563eb);
+}
+
+.product-card-rating {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    margin-bottom: 8px;
+}
+
+.stars {
+    display: flex;
+    gap: 1px;
+}
+
+.star-active {
+    color: #fbbf24;
+    fill: #fbbf24;
+}
+
+.star-inactive {
+    color: #cbd5e1;
+    fill: #cbd5e1;
+}
+
+.rating-count {
+    font-size: 0.8rem;
+    color: var(--muted, #64748b);
 }
 
 .product-card-description {

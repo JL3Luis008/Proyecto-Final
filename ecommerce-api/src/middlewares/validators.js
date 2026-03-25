@@ -99,6 +99,8 @@ export const quantityValidation = (field = "quantity", optional = false) => {
   return optional ? validator.optional() : validator.notEmpty().withMessage(`${field} is required`);
 };
 
+
+
 // Validación de boolean
 export const booleanValidation = (field) =>
   body(field).optional().isBoolean().withMessage(`${field} must be a boolean`);
@@ -409,6 +411,46 @@ export const productDescriptionValidation = (required = true) => {
   return required
     ? validator.notEmpty().withMessage("Description is required")
     : validator.optional();
+};
+
+// Validación de detalles de producto
+export const productDetailsValidation = (required = true) => {
+  const validator = body("details")
+    .isLength({ min: 5, max: 5000 })
+    .withMessage("Details must be between 5 and 5000 characters")
+    .trim();
+
+  return required ? validator.notEmpty().withMessage("Details is required") : validator.optional();
+};
+
+// Validación de lo que incluye el producto
+export const productIncludesValidation = (required = true) => {
+  const validator = body("includes")
+    .isLength({ min: 2, max: 1000 })
+    .withMessage("Includes must be between 2 and 1000 characters")
+    .trim();
+
+  return required ? validator.notEmpty().withMessage("Includes is required") : validator.optional();
+};
+
+// Validación de condición de producto
+export const productConditionValidation = (required = true) => {
+  const validator = body("condition")
+    .isIn(["New", "Used", "Refurbished", "Open Box"])
+    .withMessage("Condition must be New, Used, Refurbished, or Open Box")
+    .trim();
+
+  return required ? validator.notEmpty().withMessage("Condition is required") : validator.optional();
+};
+
+// Validación de región de producto
+export const productRegionValidation = (required = true) => {
+  const validator = body("region")
+    .isLength({ min: 2, max: 100 })
+    .withMessage("Region must be between 2 and 100 characters")
+    .trim();
+
+  return required ? validator.notEmpty().withMessage("Region is required") : validator.optional();
 };
 
 // Validaciones opcionales de dirección

@@ -1169,3 +1169,23 @@
     at AsyncGenerator.next (<anonymous>)
     at FindCursor.toArray (C:\Users\ASUS TUF GAMING\Desktop\FullStack 2024\Proyecto-Final\ecommerce-api\node_modules\mongodb\lib\cursor\abstract_cursor.js:422:26)
     at model.Query._find (C:\Users\ASUS TUF GAMING\Desktop\FullStack 2024\Proyecto-Final\ecommerce-api\node_modules\mongoose\lib\query.js:2430:27)
+2026-03-24T21:36:30.271Z | POST /api/products/69c2de1c0b85ab07ba8791fe/reviews | Review validation failed: user: Path `user` is required. | ValidationError: Review validation failed: user: Path `user` is required.
+    at Document.invalidate (C:\Users\ASUS TUF GAMING\Desktop\FullStack 2024\Proyecto-Final\ecommerce-api\node_modules\mongoose\lib\document.js:3358:32)
+    at C:\Users\ASUS TUF GAMING\Desktop\FullStack 2024\Proyecto-Final\ecommerce-api\node_modules\mongoose\lib\document.js:3119:17
+    at C:\Users\ASUS TUF GAMING\Desktop\FullStack 2024\Proyecto-Final\ecommerce-api\node_modules\mongoose\lib\schemaType.js:1410:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)
+2026-03-24T21:36:38.800Z | POST /api/products/69c2de1c0b85ab07ba8791fe/reviews | Review validation failed: user: Path `user` is required. | ValidationError: Review validation failed: user: Path `user` is required.
+    at Document.invalidate (C:\Users\ASUS TUF GAMING\Desktop\FullStack 2024\Proyecto-Final\ecommerce-api\node_modules\mongoose\lib\document.js:3358:32)
+    at C:\Users\ASUS TUF GAMING\Desktop\FullStack 2024\Proyecto-Final\ecommerce-api\node_modules\mongoose\lib\document.js:3119:17
+    at C:\Users\ASUS TUF GAMING\Desktop\FullStack 2024\Proyecto-Final\ecommerce-api\node_modules\mongoose\lib\schemaType.js:1410:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)
+2026-03-24T21:36:39.640Z | POST /api/products/69c2de1c0b85ab07ba8791fe/reviews | Review validation failed: user: Path `user` is required. | ValidationError: Review validation failed: user: Path `user` is required.
+    at Document.invalidate (C:\Users\ASUS TUF GAMING\Desktop\FullStack 2024\Proyecto-Final\ecommerce-api\node_modules\mongoose\lib\document.js:3358:32)
+    at C:\Users\ASUS TUF GAMING\Desktop\FullStack 2024\Proyecto-Final\ecommerce-api\node_modules\mongoose\lib\document.js:3119:17
+    at C:\Users\ASUS TUF GAMING\Desktop\FullStack 2024\Proyecto-Final\ecommerce-api\node_modules\mongoose\lib\schemaType.js:1410:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)
+2026-03-24T21:37:14.824Z | POST /api/products/69c2de1c0b85ab07ba8791fe/reviews | Review validation failed: user: Path `user` is required. | ValidationError: Review validation failed: user: Path `user` is required.
+    at Document.invalidate (C:\Users\ASUS TUF GAMING\Desktop\FullStack 2024\Proyecto-Final\ecommerce-api\node_modules\mongoose\lib\document.js:3358:32)
+    at C:\Users\ASUS TUF GAMING\Desktop\FullStack 2024\Proyecto-Final\ecommerce-api\node_modules\mongoose\lib\document.js:3119:17
+    at C:\Users\ASUS TUF GAMING\Desktop\FullStack 2024\Proyecto-Final\ecommerce-api\node_modules\mongoose\lib\schemaType.js:1410:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)

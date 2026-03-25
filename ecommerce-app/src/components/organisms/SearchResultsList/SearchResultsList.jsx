@@ -15,6 +15,8 @@ export default function SearchResultsList() {
   });
 
   const query = (searchParams.get("q") || "").trim();
+  const company = (searchParams.get("company") || "").trim();
+  const categoryId = (searchParams.get("category") || "").trim();
   const page = parseInt(searchParams.get("page")) || 1;
   const sortBy = searchParams.get("sort") || "name";
   const sortOrder = searchParams.get("order") || "asc";
@@ -22,16 +24,22 @@ export default function SearchResultsList() {
   useEffect(() => {
     let isMounted = true;
     const loadProducts = async () => {
-      if (!query) return;
+      if (!query && !company && !categoryId) {
+        setProducts([]);
+        setLoading(false);
+        return;
+      }
 
       try {
         setLoading(true);
         const data = await searchProducts({
-          q: query,
+          q: query || undefined,
+          company: company || undefined,
+          category: categoryId || undefined,
           page,
           sort: sortBy,
           order: sortOrder,
-          limit: 10
+          limit: 12
         });
 
         if (isMounted) {
@@ -50,7 +58,7 @@ export default function SearchResultsList() {
     return () => {
       isMounted = false;
     };
-  }, [query, page, sortBy, sortOrder]);
+  }, [query, company, categoryId, page, sortBy, sortOrder]);
 
   const handlePageChange = (newPage) => {
     const newParams = new URLSearchParams(searchParams);
@@ -72,25 +80,27 @@ export default function SearchResultsList() {
     setSearchParams(newParams);
   };
 
-  const hasQuery = query.length > 0;
-  const showNoResults = hasQuery && !loading && products.length === 0;
+  const hasFilters = query.length > 0 || company.length > 0 || categoryId.length > 0;
+  const showNoResults = hasFilters && !loading && products.length === 0;
 
   return (
     <div className="search-results-fullwidth">
       <header className="search-results-header">
         <div>
           <h1 className="search-results-title">
-            {hasQuery
-              ? `Resultados para "${query}"`
+            {query 
+              ? `Resultados para "${query}"` 
+              : company 
+              ? `Productos de ${company}`
               : "Explora nuestro catálogo"}
           </h1>
           <p className="search-results-description">
-            {hasQuery
-              ? "Estos son los productos que encontramos basados en tu búsqueda."
-              : "Usa la barra de búsqueda para encontrar rápidamente lo que necesitas."}
+            {(query || company)
+              ? "Estos son los productos que encontramos basados en tu selección."
+              : "Usa los menús o la barra de búsqueda para encontrar lo que necesitas."}
           </p>
         </div>
-        {hasQuery && (
+        {hasFilters && (
           <div className="search-results-controls">
             <label>Ordenar por:</label>
             <select value={sortBy} onChange={(e) => handleSortChange(e.target.value)}>
@@ -126,12 +136,12 @@ export default function SearchResultsList() {
         </div>
       )}
 
-      {!loading && hasQuery && !showNoResults && (
+      {!loading && hasFilters && !showNoResults && (
         <>
           <List
             products={products}
             layout="vertical"
-            title={`Mostrando resultados para "${query}"`}
+            title={query ? `Resultados para "${query}"` : company ? `Catálogo de ${company}` : ""}
           />
           <Pagination
             currentPage={paginationInfo.currentPage}
@@ -141,12 +151,12 @@ export default function SearchResultsList() {
         </>
       )}
 
-      {!loading && !hasQuery && (
+      {!loading && !hasFilters && (
         <div className="search-results-message">
           <h3>¿Buscas algo en especial?</h3>
           <p>
-            Comienza a escribir en la barra de búsqueda y te mostraremos los
-            resultados aquí mismo.
+            Comienza a escribir en la barra de búsqueda o explora nuestras{" "}
+            <Link to="/">categorías</Link>.
           </p>
         </div>
       )}

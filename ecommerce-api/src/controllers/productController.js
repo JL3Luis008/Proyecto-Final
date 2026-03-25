@@ -1,5 +1,19 @@
 import Product from '../models/product.js';
+import Category from '../models/category.js';
 import errorHandler from '../middlewares/errorHandler.js';
+
+// Helper to get all descendant category IDs
+async function getAllCategoryDescendants(categoryId) {
+  let descendants = [];
+  const children = await Category.find({ parentCategory: categoryId }).select("_id");
+  
+  for (const child of children) {
+    descendants.push(child._id);
+    const subDescendants = await getAllCategoryDescendants(child._id);
+    descendants = [...descendants, ...subDescendants];
+  }
+  return descendants;
+}
 
 
 
@@ -65,9 +79,33 @@ async function getProductByCategory(req, res, next) {
 
 async function createProduct(req, res, next) {
   try {
-    const { name, description, company, price, stock, imagesUrl, category } = req.body;
+    const {
+      name,
+      description,
+      details,
+      includes,
+      condition,
+      region,
+      company,
+      price,
+      stock,
+      imagesUrl,
+      category,
+    } = req.body;
 
-    const newProduct = await Product.create({ name, description, company, price, stock, imagesUrl, category });
+    const newProduct = await Product.create({
+      name,
+      description,
+      details,
+      includes,
+      condition,
+      region,
+      company,
+      price,
+      stock,
+      imagesUrl,
+      category,
+    });
     res.status(201).json(newProduct);
   } catch (error) {
     next(error);
@@ -76,10 +114,34 @@ async function createProduct(req, res, next) {
 async function updateProduct(req, res, next) {
   try {
     const id = req.params.id;
-    const { name, description, company, price, stock, imagesUrl, category } = req.body;
+    const {
+      name,
+      description,
+      details,
+      includes,
+      condition,
+      region,
+      company,
+      price,
+      stock,
+      imagesUrl,
+      category,
+    } = req.body;
 
     const updatedProduct = await Product.findByIdAndUpdate(id,
-      { name, description, company, price, stock, imagesUrl, category },
+      {
+        name,
+        description,
+        details,
+        includes,
+        condition,
+        region,
+        company,
+        price,
+        stock,
+        imagesUrl,
+        category,
+      },
       { new: true },
     );
 
@@ -110,6 +172,7 @@ async function searchProducts(req, res, next) {
     const {
       q,
       category,
+      company,
       minPrice,
       maxPrice,
       inStock,
@@ -129,7 +192,12 @@ async function searchProducts(req, res, next) {
     }
 
     if (category) {
-      filters.category = category;
+      const descendants = await getAllCategoryDescendants(category);
+      filters.category = { $in: [category, ...descendants] };
+    }
+
+    if (company) {
+      filters.company = company;
     }
 
 
@@ -181,6 +249,7 @@ async function searchProducts(req, res, next) {
           max: maxPrice ? parseFloat(maxPrice) : null,
         },
         inStock: inStock === "true",
+        company: company || null,
         sort: sort || "createdAt",
         order: order || "desc",
       },

@@ -74,13 +74,14 @@ async function createOrder(req, res, next) {
     // Verificar stock de todos los productos ANTES de crear la orden
     const stockChecks = await Promise.all(
       products.map(async (item) => {
-        const product = await Product.findById(item.productId);
+        const idToFind = item.productId || item.product;
+        const product = await Product.findById(idToFind);
         if (!product) {
-          return { productId: item.productId, error: "Product not found" };
+          return { productId: idToFind, error: "Product not found" };
         }
         if (product.stock < item.quantity) {
           return {
-            productId: item.productId,
+            productId: idToFind,
             productName: product.name,
             error: `Insufficient stock. Available: ${product.stock}, Requested: ${item.quantity}`,
             available: product.stock,

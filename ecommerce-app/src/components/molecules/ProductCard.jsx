@@ -1,17 +1,18 @@
+import React from "react";
 import { Link } from "react-router-dom";
 import { useCart } from "../../context/CartContext";
 import { useWishlist } from "../../context/WishlistContext";
 import { useAuth } from "../../context/AuthContext";
-import { Badge, Button } from "../atoms";
+import { Badge, Button, Icon } from "../atoms";
 import { getProductImageUrl } from "../../utils/imageUtils";
 
 import "./ProductCard.css";
 
-export default function ProductCard({ product, orientation = "vertical" }) {
+function ProductCard({ product, orientation = "vertical" }) {
   const { addToCart } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { isAuth } = useAuth();
-  const { name, price, stock, imagesUrl, description, _id } = product || {};
+  const { name, price, stock, imagesUrl, description, _id, rating, numReviews } = product || {};
 
   if (!product) {
     return (
@@ -47,6 +48,8 @@ export default function ProductCard({ product, orientation = "vertical" }) {
           src={getProductImageUrl(imagesUrl?.[0])}
           alt={name}
           className="product-card-image"
+          loading="lazy"
+          decoding="async"
           onError={(event) => {
             event.target.src = "/img/products/placeholder.svg";
           }}
@@ -66,6 +69,21 @@ export default function ProductCard({ product, orientation = "vertical" }) {
             {name}
           </Link>
         </h3>
+        {rating > 0 && (
+          <div className="product-card-rating">
+            <div className="stars">
+              {[...Array(5)].map((_, i) => (
+                <Icon
+                  key={i}
+                  name="star"
+                  size={14}
+                  className={i < Math.round(rating) ? "star-active" : "star-inactive"}
+                />
+              ))}
+            </div>
+            <span className="rating-count">({numReviews})</span>
+          </div>
+        )}
         {description && (
           <p className="product-card-description muted">
             {description}
@@ -92,3 +110,5 @@ export default function ProductCard({ product, orientation = "vertical" }) {
     </div>
   );
 }
+
+export default React.memo(ProductCard);

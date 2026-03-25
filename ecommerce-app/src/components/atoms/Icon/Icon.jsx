@@ -1,6 +1,6 @@
 import PropTypes from "prop-types";
 
-const Icon = ({ name, size = 20, className = "" }) => {
+const Icon = ({ name, size = 20, className = "", ...props }) => {
   const icons = {
     checkCircle: (
       <svg
@@ -798,7 +798,9 @@ const Icon = ({ name, size = 20, className = "" }) => {
   };
 
   return (
-    <span className={`icon ${className}`}>{icons[name] || icons.user}</span>
+    <span className={`icon ${className}`} {...props}>
+      {icons[name] || icons.user}
+    </span>
   );
 };
 
