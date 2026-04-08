@@ -13,8 +13,11 @@ import errorHandler from './src/middlewares/errorHandler.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-dotenv.config({ path: '.env.production' });
-//dotenv.config();
+// Initial env loading logic
+if (process.env.NODE_ENV === "production") {
+  dotenv.config({ path: path.join(__dirname, '.env.production') });
+}
+dotenv.config(); // Fallback to .env or use existing environment variables (Render Dashboard)
 
 setupGlobalErrorHandlers();
 
