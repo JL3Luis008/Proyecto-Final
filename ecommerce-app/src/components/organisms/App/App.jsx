@@ -20,6 +20,9 @@ const Product = lazy(() => import("../../../pages/Product"));
 const Profile = lazy(() => import("../../../pages/Profile"));
 const Settings = lazy(() => import("../../../pages/Settings"));
 const AdminProducts = lazy(() => import("../../../pages/AdminProducts"));
+const AdminOrders = lazy(() => import("../../../pages/AdminOrders"));
+const AdminCategories = lazy(() => import("../../../pages/AdminCategories"));
+const AdminUsers = lazy(() => import("../../../pages/AdminUsers"));
 
 function App() {
   return (
@@ -78,7 +81,7 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
-                <Route path="/order-confirmation" element={<OrderConfirmation />} />
+                <Route path="/order-confirmation/:id" element={<OrderConfirmation />} />
                 <Route
                   path="/settings"
                   element={
@@ -92,6 +95,30 @@ function App() {
                   element={
                     <ProtectedRoute allowedRoles={["admin"]}>
                       <AdminProducts />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/orders"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AdminOrders />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/categories"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AdminCategories />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/admin/users"
+                  element={
+                    <ProtectedRoute allowedRoles={["admin"]}>
+                      <AdminUsers />
                     </ProtectedRoute>
                   }
                 />

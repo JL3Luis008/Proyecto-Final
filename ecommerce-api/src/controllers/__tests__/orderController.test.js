@@ -50,7 +50,13 @@ import {
 } from "../orderController.js";
 
 function makeReqRes(overrides = {}) {
-    const req = { query: {}, params: {}, body: {}, ...overrides };
+    const req = { 
+        query: {}, 
+        params: {}, 
+        body: {}, 
+        user: { userId: "u1", role: "customer" }, 
+        ...overrides 
+    };
     const res = {
         status: vi.fn().mockReturnThis(),
         json: vi.fn().mockReturnThis(),
@@ -62,10 +68,10 @@ function makeReqRes(overrides = {}) {
 
 const sampleOrder = {
     _id: "o1",
-    user: "u1",
+    user: { _id: { toString: () => "u1" } },
     products: [{ productId: { _id: "p1", name: "G", price: 10 }, quantity: 1, price: 10 }],
     status: "pending",
-    populate: vi.fn().mockResolvedValue(true),
+    populate: vi.fn().mockReturnThis(),
 };
 
 describe("OrderController", () => {

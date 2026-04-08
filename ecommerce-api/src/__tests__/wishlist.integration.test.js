@@ -28,7 +28,11 @@ describe('Wishlist Integration Tests', () => {
       stock: 10,
       company: 'Test Company',
       category: new mongoose.Types.ObjectId(),
-      inStock: true
+      inStock: true,
+      region: 'Global',
+      condition: 'New',
+      includes: 'Product only',
+      details: 'Test product for wishlist testing'
     });
 
     const loginRes = await request(app)

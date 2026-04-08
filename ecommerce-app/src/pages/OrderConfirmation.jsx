@@ -1,36 +1,56 @@
-import { useEffect, useRef } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Icon } from "../components/atoms";
+import { useEffect, useRef, useState } from "react";
+import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Icon, Loading, ErrorMessage } from "../components/atoms";
 
 import { useCart } from "../context/CartContext";
+import { getOrderById } from "../services/orderService";
 import "./OrderConfirmation.css";
 
 export default function OrderConfirmation() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { order } = location.state || {};
+  const { id } = useParams();
+
+  const [order, setOrder] = useState(location.state?.order || null);
+  const [isLoading, setIsLoading] = useState(!location.state?.order);
+  const [fetchError, setFetchError] = useState(null);
+
   const { clearCart } = useCart();
   const clearedRef = useRef(false);
 
   useEffect(() => {
-    // Si no hay orden en el state, redirigir al inicio
-    if (!order) {
-      navigate("/");
+    // Si ya tenemos orden y ya cargamos:
+    if (order && !isLoading) {
+      if (!clearedRef.current) {
+        try { clearCart(); } catch (e) {}
+        clearedRef.current = true;
+      }
       return;
     }
 
-    // Limpiar el carrito una sola vez cuando llegamos a la confirmación
-    if (!clearedRef.current) {
-      try {
-        clearCart();
-      } catch (e) {
-        // si hay algún problema, no bloqueamos la vista de confirmación
-        // (ej. clearCart no está disponible)
-      }
-      clearedRef.current = true;
+    if (!order && id) {
+      const fetchOrder = async () => {
+        try {
+          const data = await getOrderById(id);
+          setOrder(data);
+        } catch (err) {
+          setFetchError("No se pudo cargar la orden. Verifica el enlace o intenta desde tu perfil.");
+        } finally {
+          setIsLoading(false);
+          if (!clearedRef.current) {
+             try { clearCart(); } catch (e) {}
+             clearedRef.current = true;
+          }
+        }
+      };
+      fetchOrder();
+    } else if (!order && !id) {
+       navigate("/");
     }
-  }, [order, navigate, clearCart]);
+  }, [id, order, navigate, clearCart, isLoading]);
 
+  if (isLoading) return <Loading message="Cargando detalles de tu compra..." />;
+  if (fetchError) return <div className="order-confirmation" style={{marginTop: "5rem"}}><ErrorMessage message={fetchError} /><Link to="/orders" className="button secondary mt-4">Ver mis pedidos</Link></div>;
   if (!order) return null;
 
   // Formatear la fecha para mostrarla

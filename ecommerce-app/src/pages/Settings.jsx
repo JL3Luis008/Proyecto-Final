@@ -2,22 +2,32 @@ import React, { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { getProductImageUrl } from "../utils/imageUtils";
+import { deactivateAccount } from "../services/userService";
 import { Button, Input, Loading, ErrorMessage } from "../components/atoms";
 import "./Settings.css";
 
 export default function Settings() {
     const navigate = useNavigate();
-    const { user, updateProfile, updatePassword, uploadAvatar, loading } = useAuth();
+    const { user, updateProfile, updatePassword, uploadAvatar, logout, loading } = useAuth();
 
     // Tab state
     const [activeTab, setActiveTab] = useState("profile");
+    
+    // Danger Zone state
+    const [deactivateLoading, setDeactivateLoading] = useState(false);
 
-    // Profile Form State
     const [profileData, setProfileData] = useState({
         displayName: "",
         phone: "",
     });
     const [profileStatus, setProfileStatus] = useState({ loading: false, error: null, success: false });
+
+    // Preferences State
+    const [preferencesData, setPreferencesData] = useState({
+        theme: "system",
+        emailNotifications: true,
+    });
+    const [preferencesStatus, setPreferencesStatus] = useState({ loading: false, error: null, success: false });
 
     // Password Form State
     const [passwordData, setPasswordData] = useState({
@@ -37,6 +47,12 @@ export default function Settings() {
                 displayName: user.displayName || user.name || "",
                 phone: user.phone || "",
             });
+            if (user.preferences) {
+                setPreferencesData({
+                    theme: user.preferences.theme || "system",
+                    emailNotifications: user.preferences.emailNotifications !== undefined ? user.preferences.emailNotifications : true,
+                });
+            }
         }
     }, [user]);
 
@@ -115,6 +131,49 @@ export default function Settings() {
         } else {
             setAvatarStatus({ loading: false, error: result.error, success: false });
         }
+    };
+
+    const handleDeactivateAccount = async () => {
+        if (!window.confirm("¡ATENCIÓN! Estás a punto de desactivar tu cuenta. Perderás el acceso inmediato y no podrás recuperarla sin contactar a soporte. ¿Estás absolutamente seguro(a)?")) {
+            return;
+        }
+
+        setDeactivateLoading(true);
+        try {
+            await deactivateAccount();
+            // Desloguear al usuario y redirigir al login
+            await logout(); 
+        } catch (error) {
+            console.error("Error al desactivar la cuenta", error);
+            alert("Ocurrió un error al desactivar la cuenta.");
+        } finally {
+            setDeactivateLoading(false);
+        }
+    };
+
+    const handlePreferencesSubmit = async () => {
+        setPreferencesStatus({ loading: true, error: null, success: false });
+        const result = await updateProfile({ preferences: preferencesData });
+        if (result.success) {
+            setPreferencesStatus({ loading: false, error: null, success: true });
+            setTimeout(() => setPreferencesStatus(prev => ({ ...prev, success: false })), 3000);
+        } else {
+            setPreferencesStatus({ loading: false, error: result.error, success: false });
+        }
+    };
+
+    const toggleTheme = () => {
+        setPreferencesData(prev => ({
+            ...prev,
+            theme: prev.theme === 'dark' ? 'light' : 'dark'
+        }));
+    };
+
+    const toggleEmailNotifications = () => {
+        setPreferencesData(prev => ({
+            ...prev,
+            emailNotifications: !prev.emailNotifications
+        }));
     };
 
     if (loading || !user) {
@@ -273,6 +332,21 @@ export default function Settings() {
                                     </Button>
                                 </div>
                             </form>
+
+                            <div className="danger-zone mt-5" style={{ marginTop: "3rem", borderTop: "1px solid #ffcccc", paddingTop: "2rem" }}>
+                                <h3 className="text-danger" style={{ color: "#d9534f" }}>Zona Peligrosa</h3>
+                                <p className="section-description text-muted">
+                                    Desactivar tu cuenta es una acción irreversible. Ya no podrás acceder a tu historial de pedidos ni a tu lista de deseos.
+                                </p>
+                                <Button 
+                                    variant="danger" 
+                                    onClick={handleDeactivateAccount}
+                                    loading={deactivateLoading}
+                                    disabled={deactivateLoading}
+                                >
+                                    Desactivar mi cuenta
+                                </Button>
+                            </div>
                         </div>
                     )}
 
@@ -283,25 +357,38 @@ export default function Settings() {
                             <p className="section-description">Ajusta tu experiencia en la plataforma.</p>
 
                             <div className="preferences-list">
-                                <div className="preference-item disabled-item">
+                                <div className="preference-item">
                                     <div>
                                         <h4>Tema Oscuro</h4>
                                         <p>Cambia la apariencia de la aplicación a colores oscuros.</p>
                                     </div>
-                                    <div className="toggle-switch pseudo-toggle"></div>
+                                    <div 
+                                        className={`toggle-switch pseudo-toggle ${preferencesData.theme === 'dark' ? 'active' : ''}`}
+                                        onClick={toggleTheme}
+                                        style={{ cursor: 'pointer' }}
+                                    ></div>
                                 </div>
 
-                                <div className="preference-item disabled-item">
+                                <div className="preference-item">
                                     <div>
                                         <h4>Notificaciones por Email</h4>
                                         <p>Recibe ofertas, encuestas y noticias en tu correo.</p>
                                     </div>
-                                    <div className="toggle-switch pseudo-toggle active"></div>
+                                    <div 
+                                        className={`toggle-switch pseudo-toggle ${preferencesData.emailNotifications ? 'active' : ''}`}
+                                        onClick={toggleEmailNotifications}
+                                        style={{ cursor: 'pointer' }}
+                                    ></div>
                                 </div>
 
-                                <p className="muted text-sm mt-3">
-                                    * Estas funciones llegarán en una próxima actualización.
-                                </p>
+                                {preferencesStatus.error && <ErrorMessage message={preferencesStatus.error} />}
+                                {preferencesStatus.success && <div className="alert-success mt-3" style={{ padding: "0.5rem 1rem" }}>Preferencias actualizadas correctamente.</div>}
+                                
+                                <div className="form-actions mt-4" style={{ marginTop: "2rem" }}>
+                                    <Button type="button" variant="primary" loading={preferencesStatus.loading} onClick={handlePreferencesSubmit}>
+                                        Guardar Preferencias
+                                    </Button>
+                                </div>
                             </div>
                         </div>
                     )}

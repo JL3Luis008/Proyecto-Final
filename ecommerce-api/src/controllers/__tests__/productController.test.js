@@ -59,6 +59,15 @@ vi.mock("../../models/product.js", () => ({
     },
 }));
 
+// Mock del modelo Category (usado en searchProducts para descendientes)
+vi.mock("../../models/category.js", () => ({
+    default: {
+        find: vi.fn().mockReturnValue({
+            select: vi.fn().mockResolvedValue([]),
+        }),
+    },
+}));
+
 // productController importa errorHandler — no hace nada crítico en tests unitarios
 vi.mock("../../middlewares/errorHandler.js", () => ({ default: vi.fn() }));
 
@@ -127,7 +136,7 @@ describe("ProductController", () => {
                     pagination: expect.objectContaining({
                         currentPage: 1,
                         totalPages: 1,
-                        totalResult: 1,
+                        totalResults: 1,
                     }),
                 })
             );
@@ -152,6 +161,7 @@ describe("ProductController", () => {
                     pagination: expect.objectContaining({
                         currentPage: 2,
                         totalPages: 2,
+                        totalResults: 6,
                     }),
                 })
             );
@@ -267,6 +277,10 @@ describe("ProductController", () => {
             stock: 10,
             imagesUrl: ["https://example.com/dk.jpg"],
             category: "cat1",
+            details: "Classic details",
+            includes: "Game disk",
+            condition: "New",
+            region: "Global",
         };
 
         // PR-09
@@ -337,11 +351,15 @@ describe("ProductController", () => {
         const validUpdateBody = {
             name: "Updated Mario",
             description: "Updated desc",
-            console: "NES",
+            company: "Nintendo",
             price: 34.99,
             stock: 8,
             imagesUrl: ["https://example.com/mario2.jpg"],
             category: "cat1",
+            details: undefined,
+            includes: undefined,
+            condition: undefined,
+            region: undefined,
         };
 
         // PR-13
@@ -480,7 +498,7 @@ describe("ProductController", () => {
             await searchProducts(req, res, next);
 
             expect(mockProductFind).toHaveBeenCalledWith(
-                expect.objectContaining({ category: "cat1" })
+                expect.objectContaining({ category: { $in: expect.arrayContaining(["cat1"]) } })
             );
         });
 

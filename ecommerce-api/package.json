@@ -12,6 +12,7 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
     "seedProducts": "node ./src/seed/productsCategories.js",
+    "db:seed": "node ./scripts/seed.js",
     "test:unit:wishlist": "vitest run ecommerce-api/src/controllers/__tests__/wishListController.test.js",
     "test:unit:reviews": "vitest run ecommerce-api/src/controllers/__tests__/reviewController.test.js",
     "test:unit:payments": "vitest run ecommerce-api/src/controllers/__tests__/paymentMethodController.test.js",

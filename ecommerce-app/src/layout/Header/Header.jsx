@@ -6,6 +6,7 @@ import { useCart } from "../../context/CartContext";
 import { useTheme } from "../../context/ThemeContext";
 import { useAuth } from "../../context/AuthContext";
 import Navigation from "../Navigation/Navigation";
+import NotificationDropdown from "./NotificationDropdown";
 import "./Header.css";
 
 export default function Header() {
@@ -331,6 +332,13 @@ export default function Header() {
                   </div>
                 )}
               </div>
+
+              {/* Notifications Button */}
+              {isAuth && (
+                <div style={{ marginRight: '16px' }}>
+                  <NotificationDropdown />
+                </div>
+              )}
 
               {/* Cart Button */}
               <Link

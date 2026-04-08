@@ -1,76 +1,118 @@
-import Review from '../models/review.js';
-import Product from '../models/product.js';
+import Review from "../models/Review.js";
+import Product from "../models/product.js";
 
-// Get reviews for a product
-export async function getProductReviews(req, res, next) {
+export const addProductReview = async (req, res, next) => {
   try {
-    const { id } = req.params; // Product ID
-    const reviews = await Review.find({ product: id })
-      .populate('user', 'displayName avatar')
-      .sort({ _id: -1 });
-
-    res.status(200).json(reviews);
-  } catch (error) {
-    next(error);
-  }
-}
-
-// Add a review to a product
-export async function addProductReview(req, res, next) {
-  try {
-    const { id } = req.params; // Product ID
     const { rating, comment } = req.body;
-    const userId = req.user.userId; // From authMiddleware
+    const { id: productId } = req.params;
+    const userId = req.user.userId;
 
-    const product = await Product.findById(id);
-    if (!product) {
-      return res.status(404).json({ message: 'Producto no encontrado.' });
-    }
+    const product = await Product.findById(productId);
+    if (!product) return res.status(404).json({ message: "Product not found" });
 
-    // Check if the user already reviewed this product
-    const existingReview = await Review.findOne({ product: id, user: userId });
-    if (existingReview) {
-      return res.status(400).json({ message: 'Ya has calificado este producto.' });
-    }
+    const existingReview = await Review.findOne({ product: productId, user: userId });
+    if (existingReview) return res.status(400).json({ message: "Product already reviewed" });
 
-    // Create the review
-    const newReview = await Review.create({
+    const review = await Review.create({
       user: userId,
-      product: id,
+      product: productId,
       rating: Number(rating),
       comment
     });
 
-    // Update Product average rating and number of reviews
-    const allReviews = await Review.find({ product: id });
-    const numReviews = allReviews.length;
-    const totalRating = allReviews.reduce((acc, item) => item.rating + acc, 0);
-    product.rating = totalRating / numReviews;
-    product.numReviews = numReviews;
-
+    const allReviews = await Review.find({ product: productId });
+    product.numReviews = allReviews.length;
+    product.rating = allReviews.reduce((acc, item) => item.rating + acc, 0) / allReviews.length;
     await product.save();
 
-    // Populate user details before sending back the response
-    await newReview.populate('user', 'displayName avatar');
-
-    res.status(201).json(newReview);
+    res.status(201).json(review);
   } catch (error) {
     next(error);
   }
-}
+};
 
-// Alias to satisfy reviewRoutes.js expected import
+export const getProductReviews = async (req, res, next) => {
+  try {
+    const { id: productId } = req.params;
+    const product = await Product.findById(productId);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    const reviews = await Review.find({ product: productId }).populate("user", "displayName avatar");
+    res.json(reviews);
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const createReview = addProductReview;
 
-// Stubs for other routes defined in reviewRoutes.js
-export async function deleteReview(req, res, next) {
-  res.status(501).json({ message: "Not implemented" });
-}
+export const getUserReviews = async (req, res, next) => {
+  try {
+    const reviews = await Review.find({ user: req.user.userId }).populate("product", "name imagesUrl");
+    res.json(reviews);
+  } catch (error) {
+    next(error);
+  }
+};
 
-export async function getUserReviews(req, res, next) {
-  res.status(501).json({ message: "Not implemented" });
-}
+export const updateReview = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { rating, comment } = req.body;
+    
+    if (!rating && !comment) {
+      return res.status(400).json({ message: "At least one field is required" });
+    }
 
-export async function updateReview(req, res, next) {
-  res.status(501).json({ message: "Not implemented" });
-}
+    const review = await Review.findById(id);
+    if (!review) return res.status(404).json({ message: "Review not found" });
+
+    if (review.user.toString() !== req.user.userId && req.user?.role !== 'admin') {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    if (rating) review.rating = Number(rating);
+    if (comment !== undefined) review.comment = comment;
+
+    await review.save();
+
+    const allReviews = await Review.find({ product: review.product });
+    const product = await Product.findById(review.product);
+    if (product) {
+      product.rating = allReviews.reduce((acc, item) => item.rating + acc, 0) / allReviews.length;
+      await product.save();
+    }
+
+    res.json(review);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const deleteReview = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const review = await Review.findById(id);
+    if (!review) return res.status(404).json({ message: "Review not found" });
+
+    if (review.user.toString() !== req.user.userId && req.user?.role !== 'admin') {
+      return res.status(403).json({ message: "Forbidden" });
+    }
+
+    const productId = review.product;
+    await review.deleteOne();
+
+    const allReviews = await Review.find({ product: productId });
+    const product = await Product.findById(productId);
+    if (product) {
+        product.numReviews = allReviews.length;
+        if (allReviews.length === 0) product.rating = 0;
+        else product.rating = allReviews.reduce((acc, item) => item.rating + acc, 0) / allReviews.length;
+        await product.save();
+    }
+
+    res.status(204).send();
+  } catch (error) {
+    next(error);
+  }
+};

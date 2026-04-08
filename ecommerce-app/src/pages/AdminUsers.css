@@ -1,0 +1,113 @@
+.admin-users-container {
+  padding: 2rem;
+  background-color: var(--background-color-alt);
+  min-height: calc(100vh - 140px);
+}
+
+.table-loader-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 10;
+}
+
+.admin-table-wrapper {
+  position: relative;
+}
+
+.row-inactive td {
+  background-color: rgba(0,0,0,0.02);
+  color: var(--text-muted);
+}
+
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-cell-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border-color);
+}
+
+.user-cell-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.user-id {
+  font-size: 0.75rem;
+  font-family: monospace;
+  color: var(--text-muted);
+}
+
+.user-phone {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.role-select {
+  padding: 4px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border-color);
+  font-size: 0.85rem;
+  cursor: pointer;
+  background-color: var(--surface-color);
+}
+
+.role-admin {
+  color: #2563eb;
+  font-weight: bold;
+}
+
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.status-badge.active {
+  background-color: #d1fae5;
+  color: #065f46;
+}
+
+.status-badge.inactive {
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.action-btn.toggle-btn.suspend:hover {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.action-btn.toggle-btn.activate:hover {
+  background-color: #d1fae5;
+  color: #10b981;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.pagination-info {
+  font-weight: 600;
+  color: var(--text-color);
+}

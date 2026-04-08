@@ -95,7 +95,10 @@ async function updateCart(req, res, next) {
       return res.status(403).json({ message: "Access denied. You can only update your own cart." });
     }
 
-    if (products !== undefined) cart.products = products;
+    if (products === undefined) {
+      return res.status(400).json({ message: "At least one field must be provided for update" });
+    }
+    cart.products = products;
 
     await cart.save();
     await cart.populate("user", "displayName email");

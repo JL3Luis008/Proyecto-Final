@@ -1189,3 +1189,47 @@
     at C:\Users\ASUS TUF GAMING\Desktop\FullStack 2024\Proyecto-Final\ecommerce-api\node_modules\mongoose\lib\document.js:3119:17
     at C:\Users\ASUS TUF GAMING\Desktop\FullStack 2024\Proyecto-Final\ecommerce-api\node_modules\mongoose\lib\schemaType.js:1410:9
     at process.processTicksAndRejections (node:internal/process/task_queues:85:11)
+2026-04-01T20:01:49.700Z | DELETE /api/payment-methods/69cd79ad9e3509c00d72d92b | You are not allowed to modify this payment method | Error: You are not allowed to modify this payment method
+    at assertCanManagePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:10:19)
+    at deletePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:260:5)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-04-01T20:04:04.452Z | DELETE /api/payment-methods/69cd7a345269a0d8c5fd60b7 | You are not allowed to modify this payment method | Error: You are not allowed to modify this payment method
+    at assertCanManagePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:10:19)
+    at deletePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:260:5)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-04-01T20:04:50.563Z | DELETE /api/payment-methods/69cd7a623813a4788ba99de8 | You are not allowed to modify this payment method | Error: You are not allowed to modify this payment method
+    at assertCanManagePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:10:19)
+    at deletePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:260:5)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-04-01T20:12:25.745Z | DELETE /api/payment-methods/69cd7c29d42d03413a3bb838 | You are not allowed to modify this payment method | Error: You are not allowed to modify this payment method
+    at assertCanManagePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:10:19)
+    at deletePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:260:5)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-04-01T20:25:41.876Z | DELETE /api/payment-methods/69cd7f4596f1ec6bf7222b77 | You are not allowed to modify this payment method | Error: You are not allowed to modify this payment method
+    at assertCanManagePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:10:19)
+    at deletePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:260:5)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-04-01T20:34:12.774Z | DELETE /api/payment-methods/69cd81441788a1974c34d53e | You are not allowed to modify this payment method | Error: You are not allowed to modify this payment method
+    at assertCanManagePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:10:19)
+    at deletePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:260:5)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-04-01T20:59:25.288Z | DELETE /api/payment-methods/69cd872dc322d1932d5916b9 | You are not allowed to modify this payment method | Error: You are not allowed to modify this payment method
+    at assertCanManagePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:10:19)
+    at deletePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:260:5)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-04-01T21:08:32.790Z | DELETE /api/payment-methods/69cd8950c246bab400a353fc | You are not allowed to modify this payment method | Error: You are not allowed to modify this payment method
+    at assertCanManagePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:10:19)
+    at deletePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:260:5)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-04-01T21:23:08.132Z | DELETE /api/payment-methods/69cd8cbc152d97c51d7e49d9 | You are not allowed to modify this payment method | Error: You are not allowed to modify this payment method
+    at assertCanManagePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:10:19)
+    at deletePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:260:5)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-04-01T21:29:12.860Z | DELETE /api/payment-methods/69cd8e28c5c2c154f403f770 | You are not allowed to modify this payment method | Error: You are not allowed to modify this payment method
+    at assertCanManagePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:10:19)
+    at deletePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:260:5)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-04-01T21:33:46.687Z | DELETE /api/payment-methods/69cd8f3a33b0260f27d42286 | You are not allowed to modify this payment method | Error: You are not allowed to modify this payment method
+    at assertCanManagePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:10:19)
+    at deletePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:260:5)
+    at processTicksAndRejections (node:internal/process/task_queues:105:5)

@@ -1,16 +1,17 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createReview, getProductReviews, getUserReviews, updateReview, deleteReview } from '../reviewController.js';
 
-vi.mock('../../models/review.js');
+vi.mock('../../models/Review.js');
 vi.mock('../../models/product.js');
 
-import Review from '../../models/review.js';
+import Review from '../../models/Review.js';
 import Product from '../../models/product.js';
 
 const mockRes = () => {
   const res = {};
   res.status = vi.fn().mockReturnValue(res);
   res.json = vi.fn().mockReturnValue(res);
+  res.send = vi.fn().mockReturnValue(res);
   return res;
 };
 
@@ -30,7 +31,7 @@ describe('ReviewController - Unit Tests (Error Paths)', () => {
   describe('createReview', () => {
     it('should return 404 when product does not exist', async () => {
       Product.findById = vi.fn().mockResolvedValue(null);
-      const req = mockReq({ body: { product: 'prod123', rating: 5, comment: 'Great' } });
+      const req = mockReq({ params: { id: 'prod123' }, body: { rating: 5, comment: 'Great' } });
       const res = mockRes();
       await createReview(req, res, vi.fn());
       expect(res.status).toHaveBeenCalledWith(404);
@@ -40,16 +41,16 @@ describe('ReviewController - Unit Tests (Error Paths)', () => {
     it('should return 400 when user already reviewed the product', async () => {
       Product.findById = vi.fn().mockResolvedValue({ _id: 'prod123' });
       Review.findOne = vi.fn().mockResolvedValue({ _id: 'rev999' });
-      const req = mockReq({ body: { product: 'prod123', rating: 5, comment: 'Great' } });
+      const req = mockReq({ params: { id: 'prod123' }, body: { rating: 5, comment: 'Great' } });
       const res = mockRes();
       await createReview(req, res, vi.fn());
       expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ message: 'You have already reviewed this product' });
+      expect(res.json).toHaveBeenCalledWith({ message: 'Product already reviewed' });
     });
 
     it('should call next on DB error', async () => {
       Product.findById = vi.fn().mockRejectedValue(new Error('DB error'));
-      const req = mockReq({ body: { product: 'prod123', rating: 5, comment: 'Great' } });
+      const req = mockReq({ params: { id: 'prod123' }, body: { rating: 5, comment: 'Great' } });
       const res = mockRes();
       const next = vi.fn();
       await createReview(req, res, next);
@@ -61,18 +62,18 @@ describe('ReviewController - Unit Tests (Error Paths)', () => {
   // getProductReviews
   // -----------------------------------------------------------------------
   describe('getProductReviews', () => {
-    it('should return empty reviews list for a product', async () => {
-      Review.find = vi.fn().mockReturnValue({ populate: vi.fn().mockReturnValue({ sort: vi.fn().mockResolvedValue([]) }) });
-      const req = mockReq({ params: { productId: 'prod123' } });
+    it('should return reviews for a product', async () => {
+      Product.findById = vi.fn().mockResolvedValue({ _id: 'prod123' });
+      Review.find = vi.fn().mockReturnValue({ populate: vi.fn().mockResolvedValue([]) });
+      const req = mockReq({ params: { id: 'prod123' } });
       const res = mockRes();
       await getProductReviews(req, res, vi.fn());
-      expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ count: 0 }));
+      expect(res.json).toHaveBeenCalledWith([]);
     });
 
     it('should call next on DB error', async () => {
-      Review.find = vi.fn().mockReturnValue({ populate: vi.fn().mockReturnValue({ sort: vi.fn().mockRejectedValue(new Error('DB error')) }) });
-      const req = mockReq({ params: { productId: 'prod123' } });
+      Product.findById = vi.fn().mockRejectedValue(new Error('DB error'));
+      const req = mockReq({ params: { id: 'prod123' } });
       const next = vi.fn();
       await getProductReviews(req, mockRes(), next);
       expect(next).toHaveBeenCalledWith(expect.any(Error));
@@ -84,7 +85,7 @@ describe('ReviewController - Unit Tests (Error Paths)', () => {
   // -----------------------------------------------------------------------
   describe('getUserReviews', () => {
     it('should call next on DB error', async () => {
-      Review.find = vi.fn().mockReturnValue({ populate: vi.fn().mockReturnValue({ sort: vi.fn().mockRejectedValue(new Error('DB error')) }) });
+      Review.find = vi.fn().mockReturnValue({ populate: vi.fn().mockRejectedValue(new Error('DB error')) });
       const req = mockReq();
       const next = vi.fn();
       await getUserReviews(req, mockRes(), next);
@@ -98,7 +99,7 @@ describe('ReviewController - Unit Tests (Error Paths)', () => {
   describe('updateReview', () => {
     it('should return 400 when no field is provided', async () => {
       Review.findById = vi.fn().mockResolvedValue({ _id: 'rev123', user: { toString: () => 'user123' } });
-      const req = mockReq({ params: { reviewId: 'rev123' }, body: {} });
+      const req = mockReq({ params: { id: 'rev123' }, body: {} });
       const res = mockRes();
       await updateReview(req, res, vi.fn());
       expect(res.status).toHaveBeenCalledWith(400);
@@ -106,7 +107,7 @@ describe('ReviewController - Unit Tests (Error Paths)', () => {
 
     it('should return 404 when review not found', async () => {
       Review.findById = vi.fn().mockResolvedValue(null);
-      const req = mockReq({ params: { reviewId: 'rev123' }, body: { rating: 5 } });
+      const req = mockReq({ params: { id: 'rev123' }, body: { rating: 5 } });
       const res = mockRes();
       await updateReview(req, res, vi.fn());
       expect(res.status).toHaveBeenCalledWith(404);
@@ -115,7 +116,7 @@ describe('ReviewController - Unit Tests (Error Paths)', () => {
 
     it('should return 403 when user does not own the review', async () => {
       Review.findById = vi.fn().mockResolvedValue({ _id: 'rev123', user: { toString: () => 'other_user' } });
-      const req = mockReq({ params: { reviewId: 'rev123' }, body: { rating: 4 } });
+      const req = mockReq({ params: { id: 'rev123' }, body: { rating: 4 } });
       const res = mockRes();
       await updateReview(req, res, vi.fn());
       expect(res.status).toHaveBeenCalledWith(403);
@@ -123,7 +124,7 @@ describe('ReviewController - Unit Tests (Error Paths)', () => {
 
     it('should call next on DB error', async () => {
       Review.findById = vi.fn().mockRejectedValue(new Error('DB error'));
-      const req = mockReq({ params: { reviewId: 'rev123' }, body: { rating: 5 } });
+      const req = mockReq({ params: { id: 'rev123' }, body: { rating: 5 } });
       const next = vi.fn();
       await updateReview(req, mockRes(), next);
       expect(next).toHaveBeenCalledWith(expect.any(Error));
@@ -136,7 +137,7 @@ describe('ReviewController - Unit Tests (Error Paths)', () => {
   describe('deleteReview', () => {
     it('should return 404 when review not found', async () => {
       Review.findById = vi.fn().mockResolvedValue(null);
-      const req = mockReq({ params: { reviewId: 'rev123' } });
+      const req = mockReq({ params: { id: 'rev123' } });
       const res = mockRes();
       await deleteReview(req, res, vi.fn());
       expect(res.status).toHaveBeenCalledWith(404);
@@ -144,7 +145,7 @@ describe('ReviewController - Unit Tests (Error Paths)', () => {
 
     it('should return 403 when user does not own the review', async () => {
       Review.findById = vi.fn().mockResolvedValue({ _id: 'rev123', user: { toString: () => 'other_user' }, deleteOne: vi.fn() });
-      const req = mockReq({ params: { reviewId: 'rev123' } });
+      const req = mockReq({ params: { id: 'rev123' } });
       const res = mockRes();
       await deleteReview(req, res, vi.fn());
       expect(res.status).toHaveBeenCalledWith(403);
@@ -152,7 +153,7 @@ describe('ReviewController - Unit Tests (Error Paths)', () => {
 
     it('should call next on DB error', async () => {
       Review.findById = vi.fn().mockRejectedValue(new Error('DB error'));
-      const req = mockReq({ params: { reviewId: 'rev123' } });
+      const req = mockReq({ params: { id: 'rev123' } });
       const next = vi.fn();
       await deleteReview(req, mockRes(), next);
       expect(next).toHaveBeenCalledWith(expect.any(Error));

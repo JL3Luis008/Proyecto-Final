@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useAuth } from "./AuthContext";
-import { getWishlist, addToWishlist, removeFromWishlist } from "../services/wishlistService";
+import { getWishlist, addToWishlist, removeFromWishlist, moveToCart as moveToCartApi, clearWishlist as clearWishlistApi } from "../services/wishlistService";
 
 const WishlistContext = createContext(null);
 
@@ -82,11 +82,44 @@ export function WishlistProvider({ children }) {
         }
     };
 
+    const moveToCart = async (productId) => {
+        if (!isAuth) {
+            return { success: false, error: "not_authenticated" };
+        }
+        
+        try {
+            await moveToCartApi(productId);
+            // Optimistically remove from wishlist local state
+            setWishlistItems(prev => prev.filter(id => id !== productId));
+            return { success: true };
+        } catch (error) {
+            console.error("Error moving to cart:", error);
+            return { success: false, error: error.message };
+        }
+    };
+
+    const clearWishlist = async () => {
+        if (!isAuth) {
+            return { success: false, error: "not_authenticated" };
+        }
+        
+        try {
+            await clearWishlistApi();
+            setWishlistItems([]);
+            return { success: true };
+        } catch (error) {
+            console.error("Error clearing wishlist:", error);
+            return { success: false, error: error.message };
+        }
+    };
+
     const value = {
         wishlistItems,
         loadingWishlist,
         isInWishlist,
         toggleWishlist,
+        moveToCart,
+        clearWishlist
     };
 
     return <WishlistContext.Provider value={value}>{children}</WishlistContext.Provider>;

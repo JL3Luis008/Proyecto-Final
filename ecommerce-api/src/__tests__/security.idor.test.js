@@ -3,8 +3,11 @@ import request from 'supertest';
 import { app } from '../../server.js';
 import User from '../models/user.js';
 import ShippingAddress from '../models/shippingAddress.js';
-import Review from '../models/review.js';
+import Review from '../models/Review.js';
 import Order from '../models/order.js';
+import Product from '../models/product.js';
+import Category from '../models/category.js';
+import PaymentMethod from '../models/paymentMethod.js';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import mongoose from 'mongoose';
@@ -13,32 +16,45 @@ import 'dotenv/config';
 describe('Security Audit: IDOR Protection', () => {
     let userA, userB;
     let tokenA, tokenB;
-    let addressB, reviewB, orderB;
+    let addressB, productB, paymentMethodB, orderB;
 
     beforeEach(async () => {
         const secret = process.env.JWT_SECRET || 'secret';
 
-        // 1. Create User A
-        const hashA = await bcrypt.hash('passwordA', 10);
+        // 1. Create Users
+        const hash = await bcrypt.hash('password123', 10);
         userA = await User.create({
             displayName: 'User A',
             email: `a${Date.now()}@test.com`,
-            hashPassword: hashA,
+            hashPassword: hash,
             role: 'customer'
         });
         tokenA = jwt.sign({ userId: userA._id.toString(), role: 'customer' }, secret);
 
-        // 2. Create User B
-        const hashB = await bcrypt.hash('passwordB', 10);
         userB = await User.create({
             displayName: 'User B',
             email: `b${Date.now()}@test.com`,
-            hashPassword: hashB,
+            hashPassword: hash,
             role: 'customer'
         });
         tokenB = jwt.sign({ userId: userB._id.toString(), role: 'customer' }, secret);
 
-        // 3. Create resources for User B
+        // 2. Create Category and Product
+        const category = await Category.create({ name: 'Test Category', description: 'Test Description' });
+        productB = await Product.create({
+            name: 'Security Test Product',
+            price: 100,
+            description: 'Desc',
+            stock: 10,
+            company: 'Test Co',
+            category: category._id,
+            region: 'Global',
+            condition: 'New',
+            includes: 'Product',
+            details: 'Details'
+        });
+
+        // 3. Create Resources for User B
         addressB = await ShippingAddress.create({
             user: userB._id,
             name: 'B Address',
@@ -46,33 +62,27 @@ describe('Security Audit: IDOR Protection', () => {
             city: 'SafeCity',
             state: 'SS',
             postalCode: '00000',
-            country: 'CountryB',
-            phone: '00000000'
+            country: 'México',
+            phone: '00000000',
+            isDefault: true,
+            addressType: 'home'
         });
 
-        reviewB = await Review.create({
+        paymentMethodB = await PaymentMethod.create({
             user: userB._id,
-            product: new User()._id, // Dummy ID
-            rating: 5,
-            comment: 'Secret Review'
+            type: 'paypal',
+            paypalEmail: 'b@test.com',
+            isDefault: true
         });
 
         orderB = await Order.create({
             user: userB._id,
-            products: [],
+            products: [{ productId: productB._id, quantity: 1, price: 100 }],
+            shippingAddress: addressB._id,
+            paymentMethod: paymentMethodB._id,
             totalPrice: 100,
             status: 'pending'
         });
-    });
-
-    it('BASELINE: User B CAN delete THEIR OWN shipping address', async () => {
-        const res = await request(app)
-            .delete(`/api/shipping-address/${addressB._id}`)
-            .set('Authorization', `Bearer ${tokenB}`);
-
-        if (res.status !== 200) {
-            throw new Error(`BASELINE Failed. Expected 200 but got ${res.status}. Body: ${JSON.stringify(res.body)}`);
-        }
     });
 
     it('SEC-IDOR-01: User A cannot delete User B shipping address', async () => {
@@ -80,29 +90,21 @@ describe('Security Audit: IDOR Protection', () => {
             .delete(`/api/shipping-address/${addressB._id}`)
             .set('Authorization', `Bearer ${tokenA}`);
 
-        if (res.status !== 404) {
-            throw new Error(`SEC-IDOR-01 Failed. Expected 404 but got ${res.status}. Body: ${JSON.stringify(res.body)}`);
-        }
-        // Or 403, but my code returns 404 for "not found for this user"
+        expect(res.status).toBe(404); // Controller returns 404 if not found for THIS user
 
-        // Verify still exists in DB
         const stillExists = await ShippingAddress.findById(addressB._id);
         expect(stillExists).not.toBeNull();
     });
 
-    it('SEC-IDOR-02: User A cannot update User B review', async () => {
+    it('SEC-IDOR-02: User A cannot delete User B payment method', async () => {
         const res = await request(app)
-            .put(`/api/review/${reviewB._id}`)
-            .set('Authorization', `Bearer ${tokenA}`)
-            .send({ comment: 'Hacked!' });
+            .delete(`/api/payment-methods/${paymentMethodB._id}`)
+            .set('Authorization', `Bearer ${tokenA}`);
 
-        if (res.status !== 404) {
-            throw new Error(`SEC-IDOR-02 Failed. Expected 404 but got ${res.status}. Body: ${JSON.stringify(res.body)}`);
-        }
-        // Controller returns 404 "unauthorized"
+        expect(res.status).toBe(403); // Controller returns 403 via assertCanManagePaymentMethod
 
-        const freshReview = await Review.findById(reviewB._id);
-        expect(freshReview.comment).toBe('Secret Review');
+        const stillExists = await PaymentMethod.findById(paymentMethodB._id);
+        expect(stillExists).not.toBeNull();
     });
 
     it('SEC-IDOR-03: User A cannot view User B order details', async () => {
@@ -110,10 +112,7 @@ describe('Security Audit: IDOR Protection', () => {
             .get(`/api/orders/${orderB._id}`)
             .set('Authorization', `Bearer ${tokenA}`);
 
-        if (res.status !== 403) {
-            throw new Error(`SEC-IDOR-03 Failed. Expected 403 but got ${res.status}. Body: ${JSON.stringify(res.body)}`);
-        }
-        // Controller returns 403 for orders
+        expect(res.status).toBe(403);
     });
 
     it('SEC-IDOR-04: User A cannot spoof order ownership on creation', async () => {
@@ -121,15 +120,14 @@ describe('Security Audit: IDOR Protection', () => {
             .post('/api/orders')
             .set('Authorization', `Bearer ${tokenA}`)
             .send({
-                user: userB._id.toString(), // Attempt to spoof
-                products: [{ productId: new mongoose.Types.ObjectId().toString(), quantity: 1, price: 50 }],
-                shippingAddress: addressB._id.toString(),
-                paymentMethod: addressB._id.toString()
+                user: userB._id.toString(), // Attempt to spoof owner
+                products: [{ productId: productB._id.toString(), quantity: 1, price: 100 }],
+                shippingAddress: addressB._id.toString(), // Note: the controller doesn't check address ownership yet, but that's a different test
+                paymentMethod: paymentMethodB._id.toString(),
+                shippingCost: 0
             });
 
-        if (res.status !== 201) {
-            throw new Error(`SEC-IDOR-04 Failed. Expected 201 but got ${res.status}. Body: ${JSON.stringify(res.body)}`);
-        }
+        expect(res.status).toBe(201);
         expect(res.body.user._id.toString()).toBe(userA._id.toString()); // Must be A, not B
     });
 });

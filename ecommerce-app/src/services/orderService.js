@@ -31,3 +31,44 @@ export const getOrderById = async (orderId) => {
     return null;
   }
 };
+
+// Admin Endpoints
+export const getOrders = async () => {
+  try {
+    const response = await http.get("orders");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all orders:", error);
+    throw error;
+  }
+};
+
+export const updateOrderStatus = async (orderId, status) => {
+  try {
+    const response = await http.patch(`orders/${orderId}/status`, { status });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating order status:", error);
+    throw error;
+  }
+};
+
+export const updatePaymentStatus = async (orderId, paymentStatus) => {
+  try {
+    const response = await http.patch(`orders/${orderId}/payment-status`, { paymentStatus });
+    return response.data;
+  } catch (error) {
+    console.error("Error updating payment status:", error);
+    throw error;
+  }
+};
+
+export const cancelOrder = async (orderId) => {
+  try {
+    const response = await http.patch(`orders/${orderId}/cancel`);
+    return response.data;
+  } catch (error) {
+    console.error("Error cancelling order:", error);
+    throw error;
+  }
+};

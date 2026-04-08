@@ -35,6 +35,16 @@ export const changePassword = async (passwordData) => {
   }
 };
 
+export const deactivateAccount = async () => {
+  try {
+    const res = await http.patch("users/deactivate");
+    return res.data;
+  } catch (error) {
+    console.error("Error deactivating account:", error);
+    throw error;
+  }
+};
+
 // Admin functions
 export const getAllUsers = async (params) => {
   try {
@@ -62,6 +72,16 @@ export const updateUser = async (userId, userData) => {
     return res.data.user;
   } catch (error) {
     console.error("Error updating user (admin):", error);
+    throw error;
+  }
+};
+
+export const toggleUserStatus = async (userId) => {
+  try {
+    const res = await http.patch(`users/${userId}/toggle-status`);
+    return res.data;
+  } catch (error) {
+    console.error("Error toggling user status:", error);
     throw error;
   }
 };

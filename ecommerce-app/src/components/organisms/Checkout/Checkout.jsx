@@ -520,7 +520,7 @@ export default function Checkout() {
                   suppressRedirect.current = true;
                   clearCart();
 
-                  navigate("/order-confirmation", {
+                  navigate(`/order-confirmation/${confirmedOrder._id || confirmedOrder.id}`, {
                     state: { order: confirmedOrder },
                   });
                 } catch (error) {

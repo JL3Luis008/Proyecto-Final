@@ -1,35 +1,29 @@
 [
   {
-    "title": "El mejor catalogo de video juegos retro",
-    "subtitle": "Juega tus clasicos preferidos",
-    "image": ["/img/products/banner1.jpg"],
-    "buttonText": "Ver colección",
-    "buttonLink": "/collections/retro",
-    "backgroundColor": "#26336c"
+    "id": 1,
+    "title": "Colección de Verano 2024",
+    "subtitle": "Descubre las últimas tendencias en moda gamer y tech.",
+    "image": "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+    "backgroundColor": "#1a1a1a",
+    "buttonText": "Explorar Ahora",
+    "buttonLink": "/productos/category/67a14918e80ae4086ad005f7"
   },
   {
-    "title": "streaming de tus juegos retro preferidos",
-    "subtitle": "visita nuestra pagina para ver streamings",
-    "image": ["/img/products/banner2.jpg"],
-    "buttonText": "visitanos",
-    "buttonLink": "/streaming",
-    "backgroundColor": "#8677b5"
+    "id": 2,
+    "title": "Setup de Ensueño",
+    "subtitle": "Todo lo que necesitas para llevar tu streaming al siguiente nivel.",
+    "image": "https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+    "backgroundColor": "#2d3436",
+    "buttonText": "Ver Accesorios",
+    "buttonLink": "/productos/category/67a14a38e80ae4086ad005fb"
   },
   {
-    "title": "los mejores reviews de los juegos de nuetro catalogo",
-    "subtitle": "revisa nuestras reviews de tus sagas preferidas",
-    "image": ["/img/products/banner3.jpg"],
-    "buttonText": "Explorar",
-    "buttonLink": "/reviews",
-    "backgroundColor": "#3eb7ea"
-  },
-  {
-    "title": "Envío Gratis",
-    "subtitle": "En compras superiores a $1000",
-    "image": ["/img/products/banner4.jpg"],
-    "buttonText": "Comprar Ahora",
-    "buttonLink": "/free-shipping",
-    "backgroundColor": "#79bf87"
+    "id": 3,
+    "title": "Ofertas de Temporada",
+    "subtitle": "Hasta 50% de descuento en consolas y periféricos seleccionados.",
+    "image": "https://images.unsplash.com/photo-1493711662062-fa541adb3fc8?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80",
+    "backgroundColor": "#2c3e50",
+    "buttonText": "Ver Ofertas",
+    "buttonLink": "/productos"
   }
 ]
-

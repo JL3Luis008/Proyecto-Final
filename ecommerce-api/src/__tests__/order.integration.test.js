@@ -29,7 +29,11 @@ describe('Order Integration Tests (INT-OR)', () => {
             price: 60,
             description: 'Retro game',
             stock: 5,
-            company: 'Nintendo'
+            company: 'Nintendo',
+            region: 'Global',
+            condition: 'New',
+            includes: 'Game cartridge',
+            details: 'Retro game for testing orders'
         });
         productId = product._id;
 

@@ -38,3 +38,22 @@ export const checkInWishlist = async (productId) => {
     const response = await http.get(`wishList/check/${productId}`);
     return response.data.inWishList;
 };
+
+/**
+ * Mover un producto al carrito
+ * POST /api/wishList/move-to-cart
+ * @param {string} productId 
+ */
+export const moveToCart = async (productId) => {
+    const response = await http.post("wishList/move-to-cart", { productId });
+    return response.data;
+};
+
+/**
+ * Limpiar toda la wishlist
+ * DELETE /api/wishList/clear
+ */
+export const clearWishlist = async () => {
+    const response = await http.delete("wishList/clear");
+    return response.data;
+};

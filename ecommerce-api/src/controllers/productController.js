@@ -37,11 +37,11 @@ async function getProducts(req, res, next) {
     res.json({
       products,
       pagination: {
-        currentPage: page,
+        currentPage: parseInt(page),
         totalPages,
-        totalResult,
-        hasNext: page < totalPages,
-        hasPrev: page > 1,
+        totalResults: totalResult,
+        hasNext: parseInt(page) < totalPages,
+        hasPrev: parseInt(page) > 1,
       }
     });
   } catch (error) {
@@ -93,6 +93,10 @@ async function createProduct(req, res, next) {
       category,
     } = req.body;
 
+    if (!name) return res.status(400).json({ error: "Name is required" });
+    if (price === undefined) return res.status(400).json({ error: "Price is required" });
+    if (stock === undefined) return res.status(400).json({ error: "Stock is required" });
+
     const newProduct = await Product.create({
       name,
       description,
@@ -127,6 +131,8 @@ async function updateProduct(req, res, next) {
       imagesUrl,
       category,
     } = req.body;
+
+    if (!name) return res.status(400).json({ error: "Name is required" });
 
     const updatedProduct = await Product.findByIdAndUpdate(id,
       {

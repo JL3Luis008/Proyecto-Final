@@ -27,7 +27,11 @@ describe('Cart Integration Tests (INT-CA)', () => {
             price: 100,
             description: 'Desc',
             stock: 10,
-            company: 'Test Co'
+            company: 'Test Co',
+            region: 'Global',
+            condition: 'New',
+            includes: 'Product only',
+            details: 'Test product details'
         });
         productId = product._id;
     });

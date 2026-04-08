@@ -8,11 +8,12 @@ import { Loading, ErrorMessage, Button } from "../components/atoms";
 import "./WishList.css";
 
 export default function WishList() {
-    const { toggleWishlist, wishlistItems } = useWishlist();
+    const { toggleWishlist, wishlistItems, moveToCart, clearWishlist } = useWishlist();
     const { addToCart } = useCart();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [actionLoading, setActionLoading] = useState(false);
 
     useEffect(() => {
         let isMounted = true;
@@ -47,14 +48,32 @@ export default function WishList() {
         await toggleWishlist(productId);
     };
 
-    const handleAddToCart = (product) => {
-        addToCart({
-            productId: product._id,
-            name: product.name,
-            price: product.price,
-            image: product.images && product.images.length > 0 ? product.images[0] : "",
-            quantity: 1,
-        });
+    const handleClearWishlist = async () => {
+        if (!window.confirm("¿Seguro que deseas vaciar tu lista de deseos?")) return;
+        
+        setActionLoading(true);
+        const result = await clearWishlist();
+        if (!result.success) {
+            alert(result.error || "No se pudo limpiar la lista");
+        }
+        setActionLoading(false);
+    };
+
+    const handleAddToCart = async (product) => {
+        setActionLoading(true);
+        const result = await moveToCart(product._id);
+        if (result.success) {
+            addToCart({
+                productId: product._id,
+                name: product.name,
+                price: product.price,
+                image: product.images && product.images.length > 0 ? product.images[0] : "",
+                quantity: 1,
+            });
+        } else {
+            alert(result.error || "No se pudo mover el producto al carrito");
+        }
+        setActionLoading(false);
     };
 
     if (loading) return <Loading message="Cargando tu lista de deseos..." />;
@@ -75,8 +94,19 @@ export default function WishList() {
     return (
         <div className="wishlist-page">
             <div className="wishlist-header">
-                <h2>Mi Lista de Deseos</h2>
-                <p>{items.length} {items.length === 1 ? "producto guardado" : "productos guardados"}</p>
+                <div className="wishlist-header-info">
+                    <h2>Mi Lista de Deseos</h2>
+                    <p>{items.length} {items.length === 1 ? "producto guardado" : "productos guardados"}</p>
+                </div>
+                {items.length > 0 && (
+                    <Button 
+                        variant="danger" 
+                        onClick={handleClearWishlist} 
+                        disabled={actionLoading}
+                    >
+                        Limpiar Lista
+                    </Button>
+                )}
             </div>
 
             <div className="wishlist-grid">
@@ -110,10 +140,10 @@ export default function WishList() {
                             <Button
                                 variant="primary"
                                 className="btn-add-cart"
-                                disabled={product.inStock <= 0}
+                                disabled={product.inStock <= 0 || actionLoading}
                                 onClick={() => handleAddToCart(product)}
                             >
-                                Añadir al Carrito
+                                Mover al Carrito
                             </Button>
                             <Button
                                 variant="danger"

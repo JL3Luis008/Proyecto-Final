@@ -4,6 +4,13 @@ import isAdmin from "../isAdminMiddleware.js";
 import validate from "../validation.js";
 import errorHandler from "../errorHandler.js";
 
+// Mock RevokedToken model used by authMiddleware
+vi.mock("../../models/revokedToken.js", () => ({
+    default: {
+        exists: vi.fn().mockResolvedValue(null),
+    },
+}));
+
 // ─── Mocks de módulos ────────────────────────────────────────────────────────
 const { mockJwtVerify } = vi.hoisted(() => {
     const mockJwtVerify = vi.fn();
@@ -45,11 +52,12 @@ function buildReqRes() {
 // ═══════════════════════════════════════════════════════════════════════════════
 describe("authMiddleware", () => {
     beforeEach(() => {
+        process.env.JWT_SECRET = "testsecret";
         mockJwtVerify.mockReset();
     });
 
     // MW-01
-    it("Token válido → popula req.user y llama next()", () => {
+    it("Token válido → popula req.user y llama next()", async () => {
         const { req, res, next } = buildReqRes();
         req.headers["authorization"] = "Bearer validtoken";
 
@@ -59,13 +67,15 @@ describe("authMiddleware", () => {
 
         authMiddleware(req, res, next);
 
+        await vi.waitFor(() => {
+            expect(next).toHaveBeenCalledOnce();
+        });
         expect(mockJwtVerify).toHaveBeenCalledWith(
             "validtoken",
             process.env.JWT_SECRET,
             expect.any(Function)
         );
         expect(req.user).toEqual(decoded);
-        expect(next).toHaveBeenCalledOnce();
         expect(res.status).not.toHaveBeenCalled();
     });
 
@@ -82,7 +92,7 @@ describe("authMiddleware", () => {
     });
 
     // MW-03
-    it("Header Authorization sin esquema Bearer → 401", () => {
+    it("Header Authorization sin esquema Bearer → 401", async () => {
         const { req, res, next } = buildReqRes();
         req.headers["authorization"] = "Basic sometoken";
         // split(' ')[1] = 'sometoken' pero verify falla igual si el token es inválido
@@ -93,12 +103,15 @@ describe("authMiddleware", () => {
 
         authMiddleware(req, res, next);
 
-        expect(res.status).toHaveBeenCalledWith(403);
-        expect(res.json).toHaveBeenCalledWith({ message: "Forbidden" });
+        // wait for async (RevokedToken check) to resolve
+        await vi.waitFor(() => {
+            expect(res.status).toHaveBeenCalledWith(401);
+        });
+        expect(res.json).toHaveBeenCalledWith({ message: "Invalid or expired token" });
     });
 
     // MW-04
-    it("Token malformado → 403 Forbidden", () => {
+    it("Token malformado → 401 Invalid or expired token", async () => {
         const { req, res, next } = buildReqRes();
         req.headers["authorization"] = "Bearer bad.token.here";
         mockJwtVerify.mockImplementation((_token, _secret, cb) =>
@@ -107,13 +120,15 @@ describe("authMiddleware", () => {
 
         authMiddleware(req, res, next);
 
-        expect(res.status).toHaveBeenCalledWith(403);
-        expect(res.json).toHaveBeenCalledWith({ message: "Forbidden" });
+        await vi.waitFor(() => {
+            expect(res.status).toHaveBeenCalledWith(401);
+        });
+        expect(res.json).toHaveBeenCalledWith({ message: "Invalid or expired token" });
         expect(next).not.toHaveBeenCalled();
     });
 
     // MW-05 (bonus: token expirado se trata igual que malformado)
-    it("Token expirado → 403 Forbidden", () => {
+    it("Token expirado → 401 Invalid or expired token", async () => {
         const { req, res, next } = buildReqRes();
         req.headers["authorization"] = "Bearer expiredtoken";
         mockJwtVerify.mockImplementation((_token, _secret, cb) =>
@@ -122,8 +137,10 @@ describe("authMiddleware", () => {
 
         authMiddleware(req, res, next);
 
-        expect(res.status).toHaveBeenCalledWith(403);
-        expect(res.json).toHaveBeenCalledWith({ message: "Forbidden" });
+        await vi.waitFor(() => {
+            expect(res.status).toHaveBeenCalledWith(401);
+        });
+        expect(res.json).toHaveBeenCalledWith({ message: "Invalid or expired token" });
     });
 });
 

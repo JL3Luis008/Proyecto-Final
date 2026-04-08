@@ -33,6 +33,17 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  preferences: {
+    theme: {
+      type: String,
+      enum: ["light", "dark", "system"],
+      default: "system",
+    },
+    emailNotifications: {
+      type: Boolean,
+      default: true,
+    },
+  },
 });
 
 const User = mongoose.model("User", userSchema);

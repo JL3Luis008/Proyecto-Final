@@ -52,3 +52,34 @@ export const getParentCategories = async () => {
   }
 };
 
+// Admin Endpoints
+export const createCategory = async (categoryData) => {
+  try {
+    const response = await http.post("categories", categoryData);
+    return response.data;
+  } catch (error) {
+    console.error("Error creating category:", error);
+    throw error;
+  }
+};
+
+export const updateCategory = async (categoryId, categoryData) => {
+  try {
+    const response = await http.put(`categories/${categoryId}`, categoryData);
+    return response.data;
+  } catch (error) {
+    console.error("Error updating category:", error);
+    throw error;
+  }
+};
+
+export const deleteCategory = async (categoryId) => {
+  try {
+    const response = await http.delete(`categories/${categoryId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error deleting category:", error);
+    throw error;
+  }
+};
+

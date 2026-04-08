@@ -22,6 +22,9 @@ export default function ProfileCard() {
     admin: [
       { label: "Configuración de Cuenta", action: () => { navigate("/settings"); } },
       { label: "Gestión de Productos", action: () => { navigate("/admin/products"); } },
+      { label: "Gestión de Órdenes", action: () => { navigate("/admin/orders"); } },
+      { label: "Gestión de Categorías", action: () => { navigate("/admin/categories"); } },
+      { label: "Gestión de Usuarios", action: () => { navigate("/admin/users"); } },
     ],
     customer: [
       { label: "Configuración de Cuenta", action: () => { navigate("/settings"); } },

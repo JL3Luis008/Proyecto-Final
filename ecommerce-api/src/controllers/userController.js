@@ -81,10 +81,10 @@ const getUserById = async (req, res, next) => {
 const updateUserProfile = async (req, res, next) => {
   try {
     const userId = req.user.userId;
-    const { displayName, email, phone, avatar } = req.body;
+    const { displayName, email, phone, avatar, preferences } = req.body;
 
     // Validar que al menos un campo esté presente
-    if (!displayName && !email && !phone && avatar === undefined) {
+    if (!displayName && !email && !phone && avatar === undefined && !preferences) {
       return res.status(400).json({
         message: "At least one field must be provided to update",
       });
@@ -108,6 +108,11 @@ const updateUserProfile = async (req, res, next) => {
     if (email) user.email = email;
     if (phone) user.phone = phone;
     if (avatar !== undefined) user.avatar = avatar;
+    if (preferences) {
+      if (user.preferences === undefined) user.preferences = {};
+      if (preferences.theme) user.preferences.theme = preferences.theme;
+      if (preferences.emailNotifications !== undefined) user.preferences.emailNotifications = preferences.emailNotifications;
+    }
 
     await user.save();
 
