@@ -8,15 +8,13 @@ const dbConnection = async () => {
       throw new Error("MONGODB_URI is not defined in environment variables");
     }
 
-    // Trim and Clean
-    dbURI = dbURI.trim();
-    if (dbURI.includes('<') || dbURI.includes('>')) {
-      console.warn("⚠️ Warning: MONGODB_URI contains '<' or '>' brackets. Cleaning them automatically...");
-      dbURI = dbURI.replace(/[<>]/g, '');
-    }
+    // Aggressive Clean: Remove whitespace and illegal characters like < > { } " '
+    // These characters often appear when users copy-paste placeholders or JSON snippets.
+    dbURI = dbURI.trim().replace(/[<>{}"']/g, '');
 
     // Debug logging (masking password)
-    const maskedURI = dbURI.replace(/:([^@]+)@/, ':****@');
+    // Mask everything between the first : (after the scheme) and the @
+    const maskedURI = dbURI.replace(/:([^@:]+)@/, ':****@');
     console.log(`📡 Attempting to connect to: ${maskedURI}`);
 
     await mongoose.connect(dbURI, {});
