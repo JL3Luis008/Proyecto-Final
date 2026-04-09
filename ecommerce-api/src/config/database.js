@@ -8,9 +8,13 @@ const dbConnection = async () => {
       throw new Error("MONGODB_URI is not defined in environment variables");
     }
 
-    // Aggressive Clean: Remove whitespace and illegal characters like < > { } " '
-    // These characters often appear when users copy-paste placeholders or JSON snippets.
+    // Trim and Aggressive Clean: Remove whitespace and illegal characters like < > { } " '
     dbURI = dbURI.trim().replace(/[<>{}"']/g, '');
+
+    // Strip "MONGODB_URI=" prefix if it was accidentally copy-pasted into the env value
+    if (dbURI.includes('MONGODB_URI=')) {
+      dbURI = dbURI.split('MONGODB_URI=').pop().trim();
+    }
 
     // Debug logging (masking password)
     // Mask everything between the first : (after the scheme) and the @
