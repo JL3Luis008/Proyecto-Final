@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../../context/AuthContext";
 import { Button, ErrorMessage, Input } from "../../atoms";
 
@@ -10,6 +10,7 @@ export default function LoginForm({ onSuccess }) {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const location = useLocation();
   const { login, loading } = useAuth();
 
   const onSubmit = async (e) => {
@@ -56,6 +57,11 @@ export default function LoginForm({ onSuccess }) {
           </div>
 
           {error && <ErrorMessage>{error}</ErrorMessage>}
+          {location.state?.message && !error && (
+            <div className="success-message" style={{ color: "green", marginBottom: "1rem", textAlign: "center" }}>
+              {location.state.message}
+            </div>
+          )}
 
           <Button disabled={loading} type="submit" variant="primary" data-cy="login-submit">
             {loading ? "Iniciando sesión..." : "Iniciar Sesión"}

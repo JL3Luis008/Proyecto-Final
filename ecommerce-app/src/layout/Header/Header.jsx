@@ -345,9 +345,10 @@ export default function Header() {
                 to="/cart"
                 className="cart-btn"
                 aria-label="Ver carrito de compras"
+                data-cy="nav-cart-btn"
               >
                 <Icon name="shoppingCart" size={24} />
-                <span className="cart-badge">{totalItems}</span>
+                <span className="cart-badge" data-cy="cart-badge">{totalItems}</span>
               </Link>
 
               {/* Desktop Theme Toggle */}

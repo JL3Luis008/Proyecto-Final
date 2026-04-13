@@ -103,6 +103,7 @@ function ProductCard({ product, orientation = "vertical" }) {
           size="sm"
           disabled={stock === 0}
           onClick={handleAddToCart}
+          data-cy="add-to-cart-btn"
         >
           Agregar al carrito
         </Button>

@@ -400,7 +400,7 @@ export default function Checkout() {
             selected={selectedPayment}
             summaryContent={
               <div className="selected-payment">
-                <p>{selectedPayment?.alias}</p>
+                <p data-cy="selected-payment-alias">{selectedPayment?.alias}</p>
                 <p>**** {selectedPayment?.cardNumber?.slice(-4) || "----"}</p>
               </div>
             }
@@ -486,6 +486,7 @@ export default function Checkout() {
             </div>
             <Button
               className="pay-button"
+              data-cy="confirm-pay-btn"
               disabled={
                 !selectedAddress ||
                 !selectedPayment ||

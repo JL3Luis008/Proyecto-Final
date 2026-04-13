@@ -15,7 +15,7 @@ const AddressList = ({
     <div className="address-list">
       <div className="address-list-header">
         <h3>Direcciones de Envío</h3>
-        <Button onClick={onAdd}>Agregar Nueva Dirección</Button>
+        <Button data-cy="address-add-btn" onClick={onAdd}>Agregar Nueva Dirección</Button>
       </div>
       <div className="address-list-content">
         {addresses.map((address) => (

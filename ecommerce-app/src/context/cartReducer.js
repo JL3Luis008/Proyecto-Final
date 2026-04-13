@@ -48,11 +48,16 @@ export function cartReducer(state, action) {
       return { ...state, items: [] };
     }
     case CART_ACTIONS.INIT: {
-      const items = action.payload.map(item => ({
-        ...item.product,
-        quantity: item.quantity,
-        _id: item.product._id // Ensure top-level _id for the app
-      }));
+      const items = action.payload.map(item => {
+        if (item.product) {
+          return {
+            ...item.product,
+            quantity: item.quantity,
+            _id: item.product._id // Ensure top-level _id for the app
+          };
+        }
+        return item;
+      });
       return { ...state, items };
     }
     default:

@@ -23,7 +23,7 @@ setupGlobalErrorHandlers();
 
 export const app = express();
 
-if (process.env.NODE_ENV !== "test") {
+if (process.env.NODE_ENV !== "test" || !process.env.VITEST) {
   dbConnection();
 }
 
@@ -48,7 +48,7 @@ app.use(errorHandler);
 
 let server;
 
-if (process.env.NODE_ENV !== "test") {
+if (process.env.NODE_ENV !== "test" || !process.env.VITEST) {
   server = app.listen(process.env.PORT, () => {
     console.log(`Server running on http://localhost:${process.env.PORT}`);
   });

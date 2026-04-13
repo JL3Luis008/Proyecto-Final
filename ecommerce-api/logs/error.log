@@ -1233,3 +1233,8 @@
     at assertCanManagePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:10:19)
     at deletePaymentMethod (C:/Users/ASUS TUF GAMING/Desktop/FullStack 2024/Proyecto-Final/ecommerce-api/src/controllers/paymentMethodController.js:260:5)
     at processTicksAndRejections (node:internal/process/task_queues:105:5)
+2026-04-09T23:31:39.932Z | POST /api/test/seed-products | Product validation failed: company: Path `company` is required., region: Path `region` is required., condition: Path `condition` is required., includes: Path `includes` is required., details: Path `details` is required. | ValidationError: Product validation failed: company: Path `company` is required., region: Path `region` is required., condition: Path `condition` is required., includes: Path `includes` is required., details: Path `details` is required.
+    at Document.invalidate (C:\Users\ASUS TUF GAMING\Desktop\FullStack 2024\Proyecto-Final\ecommerce-api\node_modules\mongoose\lib\document.js:3358:32)
+    at C:\Users\ASUS TUF GAMING\Desktop\FullStack 2024\Proyecto-Final\ecommerce-api\node_modules\mongoose\lib\document.js:3119:17
+    at C:\Users\ASUS TUF GAMING\Desktop\FullStack 2024\Proyecto-Final\ecommerce-api\node_modules\mongoose\lib\schemaType.js:1410:9
+    at process.processTicksAndRejections (node:internal/process/task_queues:85:11)

@@ -43,11 +43,12 @@ export default function CartView() {
               onClick={() =>
                 updateQuantity(item._id, Math.max(1, item.quantity - 1))
               }
+              data-cy="decrease-qty-btn"
             >
               <Icon name="minus" size={15} />
             </Button>
 
-            <span>{item.quantity}</span>
+            <span data-cy="cart-item-qty">{item.quantity}</span>
 
             <Button
               variant="secondary"
@@ -55,6 +56,7 @@ export default function CartView() {
               onClick={() =>
                 updateQuantity(item._id, item.quantity + 1)
               }
+              data-cy="increase-qty-btn"
             >
               <Icon name="plus" size={15} />
             </Button>
@@ -70,6 +72,7 @@ export default function CartView() {
             size="sm"
             onClick={() => removeFromCart(item._id)}
             title="Eliminar artículo"
+            data-cy="remove-item-btn"
           >
             <Icon name="trash" size={16} />
           </Button>

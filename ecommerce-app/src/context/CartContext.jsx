@@ -39,19 +39,11 @@ export function CartProvider({ children }) {
         try {
           // 1. Leer items locales ANTES de sobrescribirlos con el BE
           const localRaw = localStorage.getItem("cart");
-          const localItems = localRaw ? JSON.parse(localRaw) : [];
-
           // 2. Obtener carrito del backend
           const backendCart = await cartService.getCart();
           const backendProducts = backendCart?.cart?.products || [];
 
-          if (backendProducts.length === 0 && localItems.length === 0) {
-            // Carrito vacío en ambos lados
-            dispatch({ type: CART_ACTIONS.INIT, payload: [] });
-            return;
-          }
-
-          // 3. Merge: BE es fuente de verdad para existentes; items locales únicos se añaden
+          // 3. Crear set de IDs de productos en el backend para comparación
           const backendIds = new Set(
             backendProducts.map((p) => {
               const id = p.product?._id || p.product || p._id;
@@ -59,16 +51,20 @@ export function CartProvider({ children }) {
             })
           );
 
-          // Items locales que NO están en el BE (genuinamente nuevos, añadidos sin sesión)
-          const uniqueLocalItems = localItems.filter((localItem) => {
+          // 4. Leer los items locales MÁS recientes (por si cambiaron durante el fetch)
+          const latestLocalRaw = localStorage.getItem("cart");
+          const latestLocalItems = latestLocalRaw ? JSON.parse(latestLocalRaw) : [];
+
+          // 5. Filtrar items locales que NO están en el BE
+          const uniqueLocalItems = latestLocalItems.filter((localItem) => {
             const localId = (localItem._id || localItem.productId || localItem.id)?.toString();
             return localId && !backendIds.has(localId);
           });
 
-          // 4. Inicializar el estado con productos del BE
+          // 6. Inicializar el estado con productos del BE
           dispatch({ type: CART_ACTIONS.INIT, payload: backendProducts });
 
-          // 5. Sincronizar items locales únicos al BE y al estado
+          // 7. Sincronizar items locales únicos al BE y al estado
           if (uniqueLocalItems.length > 0) {
             for (const item of uniqueLocalItems) {
               const productId = item._id || item.productId || item.id;
@@ -78,7 +74,7 @@ export function CartProvider({ children }) {
                   type: CART_ACTIONS.ADD,
                   payload: { ...item, quantity },
                 });
-                // Sincronizar con BE de forma silenciosa (fire and forget)
+                // Sincronizar con BE
                 cartService
                   .addToCart(user._id, productId, quantity)
                   .catch((err) =>

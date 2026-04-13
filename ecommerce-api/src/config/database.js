@@ -4,6 +4,11 @@ const dbConnection = async () => {
   try {
     let dbURI = process.env.MONGODB_URI;
 
+    if (process.env.NODE_ENV === "test" && process.env.MONGODB_URI_TEST) {
+      dbURI = process.env.MONGODB_URI_TEST;
+      console.log("🧪 Usando base de datos de PRUEBAS");
+    }
+
     if (!dbURI) {
       throw new Error("MONGODB_URI is not defined in environment variables");
     }

@@ -61,7 +61,7 @@ export const normalizePayment = (pay, idx = 0) => {
   const generatedId = `pay-${Date.now()}-${idx}`;
   const id = pay.id || pay._id || generatedId;
   const cardNumber = pay.cardNumber || "";
-  const alias = pay.alias || `Tarjeta ****${cardNumber.slice(-4)}`;
+  const alias = pay.alias || pay.bankName || `Tarjeta ****${cardNumber.slice(-4)}`;
   const placeHolder =
     pay.placeHolder || pay.cardHolderName || pay.cardHolder || "";
   const expireDate = pay.expireDate || pay.expiryDate || "";

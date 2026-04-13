@@ -14,7 +14,7 @@ const PaymentItem = ({ payment, isSelected, onSelect, onEdit, onDelete }) => {
         }`}
     >
       <div className="payment-content">
-        <h4>{payment.alias}</h4>
+        <h4 data-cy="payment-alias">{payment.alias}</h4>
         <p>{maskCardNumber(payment.cardNumber)}</p>
         <p>Vence: {payment.expireDate}</p>
         <p>Titular: {payment.placeHolder}</p>
