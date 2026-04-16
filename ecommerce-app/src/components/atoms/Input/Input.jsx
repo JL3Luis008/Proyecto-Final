@@ -3,16 +3,13 @@ import "./Input.css";
 export default function Input({
   id,
   label,
-  name,
   value,
   type = "text",
   placeholder = "",
-  onChange,
-  onBlur,
   error,
   showError,
-  autoComplete,
-  "data-cy": dataCy,
+  className = "",
+  ...rest
 }) {
   const errorId = `${id}-error`;
   const invalid = Boolean(showError && error);
@@ -26,16 +23,12 @@ export default function Input({
         </label>
       )}
       <input
+        {...rest}
         id={id}
         className={`input-field ${invalid ? "isInvalid" : ""}`}
-        name={name}
         type={type}
         value={value}
         placeholder={placeholder}
-        onChange={onChange}
-        onBlur={onBlur}
-        autoComplete={autoComplete}
-        data-cy={dataCy}
         aria-invalid={invalid ? "true" : "false"}
         aria-describedby={invalid ? errorId : undefined}
       />

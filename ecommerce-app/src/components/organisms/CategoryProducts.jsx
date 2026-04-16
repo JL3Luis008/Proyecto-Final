@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import Breadcrumb from "../../layout/Breadcrumb/Breadcrumb";
 import { getCategoryById } from "../../services/categoryService";
 import { getProductsByCategoryId } from "../../services/productService";
@@ -9,55 +10,37 @@ import { ErrorMessage, Loading } from "../atoms";
 import "./CategoryProducts.css";
 
 export default function CategoryProducts({ categoryId }) {
-  const [category, setCategory] = useState(null);
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [page, setPage] = useState(1);
-  const [paginationInfo, setPaginationInfo] = useState({
-    totalPages: 1,
-    currentPage: 1,
-  });
 
   useEffect(() => {
     // Reset page when category changes
     setPage(1);
   }, [categoryId]);
 
-  useEffect(() => {
-    const loadCategoryAndProducts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  const {
+    data: category,
+    isLoading: categoryLoading,
+    error: categoryError,
+  } = useQuery({
+    queryKey: ["category", categoryId],
+    queryFn: () => getCategoryById(categoryId),
+    enabled: !!categoryId,
+  });
 
-        // Fetch category info if not already loaded or if it changed
-        if (!category || category._id !== categoryId) {
-          const categoryData = await getCategoryById(categoryId);
-          if (!categoryData) {
-            setError("Categoría no encontrada");
-            setLoading(false);
-            return;
-          }
-          setCategory(categoryData);
-        }
+  const {
+    data: productsData,
+    isLoading: productsLoading,
+    error: productsError,
+  } = useQuery({
+    queryKey: ["products", "category", categoryId, page],
+    queryFn: () => getProductsByCategoryId(categoryId, page, 10),
+    enabled: !!categoryId,
+  });
 
-        // Fetch products for current page
-        const productsData = await getProductsByCategoryId(categoryId, page, 10);
-
-        setProducts(productsData.products || []);
-        setPaginationInfo(productsData.pagination || { totalPages: 1, currentPage: 1 });
-      } catch (err) {
-        console.error("Error in CategoryProducts:", err);
-        setError("Error al cargar la categoría o productos");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (categoryId) {
-      loadCategoryAndProducts();
-    }
-  }, [categoryId, page]);
+  const loading = categoryLoading || productsLoading;
+  const error = categoryError || productsError ? "Error al cargar la categoría o productos" : null;
+  const products = productsData?.products || [];
+  const paginationInfo = productsData?.pagination || { totalPages: 1, currentPage: 1 };
 
   const handlePageChange = (newPage) => {
     setPage(newPage);

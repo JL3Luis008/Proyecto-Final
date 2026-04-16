@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import { searchProducts } from "../../../services/productService";
 import List from "../List/List";
 import { Pagination } from "../../molecules";
@@ -7,12 +8,6 @@ import "./SearchResultsList.css";
 
 export default function SearchResultsList() {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [paginationInfo, setPaginationInfo] = useState({
-    totalPages: 1,
-    currentPage: 1,
-  });
 
   const query = (searchParams.get("q") || "").trim();
   const company = (searchParams.get("company") || "").trim();
@@ -21,44 +16,29 @@ export default function SearchResultsList() {
   const sortBy = searchParams.get("sort") || "name";
   const sortOrder = searchParams.get("order") || "asc";
 
-  useEffect(() => {
-    let isMounted = true;
-    const loadProducts = async () => {
-      if (!query && !company && !categoryId) {
-        setProducts([]);
-        setLoading(false);
-        return;
-      }
+  const hasFilters = query.length > 0 || company.length > 0 || categoryId.length > 0;
 
-      try {
-        setLoading(true);
-        const data = await searchProducts({
-          q: query || undefined,
-          company: company || undefined,
-          category: categoryId || undefined,
-          page,
-          sort: sortBy,
-          order: sortOrder,
-          limit: 12
-        });
+  const {
+    data,
+    isLoading: loading,
+    error,
+  } = useQuery({
+    queryKey: ["search", { query, company, categoryId, page, sortBy, sortOrder }],
+    queryFn: () =>
+      searchProducts({
+        q: query || undefined,
+        company: company || undefined,
+        category: categoryId || undefined,
+        page,
+        sort: sortBy,
+        order: sortOrder,
+        limit: 12,
+      }),
+    enabled: hasFilters,
+  });
 
-        if (isMounted) {
-          setProducts(data.products || []);
-          setPaginationInfo(data.pagination || { totalPages: 1, currentPage: 1 });
-        }
-      } catch (error) {
-        console.error("Error in SearchResultsList:", error);
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
-
-    loadProducts();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [query, company, categoryId, page, sortBy, sortOrder]);
+  const products = data?.products || [];
+  const paginationInfo = data?.pagination || { totalPages: 1, currentPage: 1 };
 
   const handlePageChange = (newPage) => {
     const newParams = new URLSearchParams(searchParams);
@@ -80,7 +60,6 @@ export default function SearchResultsList() {
     setSearchParams(newParams);
   };
 
-  const hasFilters = query.length > 0 || company.length > 0 || categoryId.length > 0;
   const showNoResults = hasFilters && !loading && products.length === 0;
 
   return (

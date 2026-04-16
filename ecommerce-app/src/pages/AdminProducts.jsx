@@ -73,7 +73,7 @@ export default function AdminProducts() {
         <div className="admin-products-container">
             <div className="admin-header">
                 <h1>Gestión de Productos</h1>
-                <Button onClick={handleCreate} variant="primary">
+                <Button onClick={handleCreate} variant="primary" data-cy="admin-add-product-btn">
                     Nuevo Producto
                 </Button>
             </div>

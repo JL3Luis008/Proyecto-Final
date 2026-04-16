@@ -20,14 +20,14 @@ export default function AdminProductTable({ products, onEdit, onDelete, paginati
                 </thead>
                 <tbody>
                     {products.map((product) => (
-                        <tr key={product._id}>
+                        <tr key={product._id} data-cy="product-row">
                             <td className="td-image">
                                 <img
                                     src={getProductImageUrl(product.imagesUrl?.[0])}
                                     alt={product.name}
                                 />
                             </td>
-                            <td className="td-name">
+                            <td className="td-name" data-cy="product-name">
                                 <strong>{product.name}</strong>
                             </td>
                             <td>{product.company}</td>
@@ -39,8 +39,8 @@ export default function AdminProductTable({ products, onEdit, onDelete, paginati
                                 </span>
                             </td>
                             <td className="td-actions">
-                                <Button size="sm" onClick={() => onEdit(product)}>Editar</Button>
-                                <Button size="sm" variant="danger" onClick={() => onDelete(product._id)}>Eliminar</Button>
+                                <Button size="sm" onClick={() => onEdit(product)} data-cy="edit-product-btn">Editar</Button>
+                                <Button size="sm" variant="danger" onClick={() => onDelete(product._id)} data-cy="delete-product-btn">Eliminar</Button>
                             </td>
                         </tr>
                     ))}

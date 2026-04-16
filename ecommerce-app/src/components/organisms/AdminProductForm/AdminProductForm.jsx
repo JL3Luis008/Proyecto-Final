@@ -255,7 +255,7 @@ export default function AdminProductForm({ product, onClose, onSuccess }) {
             </div>
 
             <div className="form-actions">
-                <Button type="submit" variant="primary" disabled={loading}>
+                <Button type="submit" variant="primary" disabled={loading} data-cy="submit-product-btn">
                     {loading ? "Guardando..." : "Guardar Producto"}
                 </Button>
                 <Button type="button" variant="secondary" onClick={onClose}>
