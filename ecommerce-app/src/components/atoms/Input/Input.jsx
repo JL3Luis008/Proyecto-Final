@@ -13,7 +13,6 @@ export default function Input({
 }) {
   const errorId = `${id}-error`;
   const invalid = Boolean(showError && error);
-  const className = "";
 
   return (
     <div className={`input-group ${className}`}>

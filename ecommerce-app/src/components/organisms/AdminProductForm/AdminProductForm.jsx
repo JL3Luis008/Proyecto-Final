@@ -93,7 +93,7 @@ export default function AdminProductForm({ product, onClose, onSuccess }) {
             }
             onSuccess();
         } catch (err) {
-            console.error("Save error:", err.response?.data);
+            console.error("Save error detail:", err.response?.data);
             let errorMessage = "Error al guardar el producto";
 
             if (err.response?.data?.errors && Array.isArray(err.response.data.errors)) {
